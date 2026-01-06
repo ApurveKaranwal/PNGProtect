@@ -2,78 +2,138 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Optional
+from pathlib import Path
+from typing import Optional
+
+import sqlite3
+
+
+DB_PATH = Path(__file__).with_name("watermarks.db")
 
 
 @dataclass
 class WatermarkRecord:
-  watermark_id: str
-  image_hash: str
-  owner_id: str
-  strength: int
-  total_bits: int
-  timestamp: datetime
+    watermark_id: str
+    image_hash: str
+    owner_id: str
+    strength: int
+    total_bits: int
+    timestamp: datetime
 
 
 class WatermarkStore:
-  """
-  Simple in-memory storage for watermark metadata.
-  Suitable for hackathon/demo purposes; swap with SQLite later if needed.
-  """
+    """
+    SQLite-backed storage for watermark metadata.
+    Persisted in watermarks.db, survives server restarts.
+    """
 
-  _instance: "WatermarkStore | None" = None
+    _instance: "WatermarkStore | None" = None
 
-  def __init__(self) -> None:
-      self.records_by_id: Dict[str, WatermarkRecord] = {}
-      self.records_by_hash: Dict[str, WatermarkRecord] = {}
+    def __init__(self) -> None:
+        # Use check_same_thread=False so FastAPI threads can share the connection.
+        # For a real app, use a connection per request or a pool via SQLAlchemy. [web:117][web:121]
+        self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        self.conn.row_factory = sqlite3.Row
+        self._ensure_schema()
 
-  @classmethod
-  def get_instance(cls) -> "WatermarkStore":
-      if cls._instance is None:
-          cls._instance = WatermarkStore()
-      return cls._instance
+    def _ensure_schema(self) -> None:
+        self.conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS watermarks (
+                watermark_id TEXT PRIMARY KEY,
+                image_hash   TEXT NOT NULL,
+                owner_id     TEXT NOT NULL,
+                strength     INTEGER NOT NULL,
+                total_bits   INTEGER NOT NULL,
+                created_at   TEXT NOT NULL
+            );
+            """
+        )
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_watermarks_image_hash ON watermarks (image_hash);"
+        )
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_watermarks_owner_id ON watermarks (owner_id);"
+        )
+        self.conn.commit()
 
-  def save_record(
-      self,
-      watermark_id: str,
-      image_hash: str,
-      owner_id: str,
-      strength: int,
-      total_bits: int,
-  ) -> None:
-      rec = WatermarkRecord(
-          watermark_id=watermark_id,
-          image_hash=image_hash,
-          owner_id=owner_id,
-          strength=strength,
-          total_bits=total_bits,
-          timestamp=datetime.utcnow(),
-      )
-      self.records_by_id[watermark_id] = rec
-      self.records_by_hash[image_hash] = rec
+    @classmethod
+    def get_instance(cls) -> "WatermarkStore":
+        if cls._instance is None:
+            cls._instance = WatermarkStore()
+        return cls._instance
 
-  def get_by_image_hash(self, image_hash: str) -> Optional[WatermarkRecord]:
-      return self.records_by_hash.get(image_hash)
+    # ---------- CRUD helpers ----------
 
-  def get_by_watermark_id(self, watermark_id: str) -> Optional[WatermarkRecord]:
-      return self.records_by_id.get(watermark_id)
+    def save_record(
+        self,
+        watermark_id: str,
+        image_hash: str,
+        owner_id: str,
+        strength: int,
+        total_bits: int,
+    ) -> None:
+        created_at = datetime.utcnow().isoformat()
+        self.conn.execute(
+            """
+            INSERT OR REPLACE INTO watermarks
+            (watermark_id, image_hash, owner_id, strength, total_bits, created_at)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """,
+            (watermark_id, image_hash, owner_id, strength, total_bits, created_at),
+        )
+        self.conn.commit()
 
-  def get_by_owner_and_hash_prefix(
-      self, extracted_text: str, image_hash: str
-  ) -> Optional[WatermarkRecord]:
-      """
-      Very simple lookup heuristic:
-      - First see if we have an exact image hash match, then trust that.
-      - If not, try to match on owner_id substring vs extracted_text.
-      """
-      rec = self.records_by_hash.get(image_hash)
-      if rec:
-          # check if extracted_text contains owner_id (common for handles/IDs)
-          if rec.owner_id in extracted_text or extracted_text in rec.owner_id:
-              return rec
+    def _row_to_record(self, row: sqlite3.Row | None) -> Optional[WatermarkRecord]:
+        if row is None:
+            return None
+        return WatermarkRecord(
+            watermark_id=row["watermark_id"],
+            image_hash=row["image_hash"],
+            owner_id=row["owner_id"],
+            strength=row["strength"],
+            total_bits=row["total_bits"],
+            timestamp=datetime.fromisoformat(row["created_at"]),
+        )
 
-      # fallback: find any record whose ownerId is inside extracted text
-      for r in self.records_by_id.values():
-          if r.owner_id in extracted_text or extracted_text in r.owner_id:
-              return r
-      return None
+    def get_by_image_hash(self, image_hash: str) -> Optional[WatermarkRecord]:
+        cur = self.conn.execute(
+            "SELECT * FROM watermarks WHERE image_hash = ? LIMIT 1;", (image_hash,)
+        )
+        row = cur.fetchone()
+        return self._row_to_record(row)
+
+    def get_by_watermark_id(self, watermark_id: str) -> Optional[WatermarkRecord]:
+        cur = self.conn.execute(
+            "SELECT * FROM watermarks WHERE watermark_id = ? LIMIT 1;", (watermark_id,)
+        )
+        row = cur.fetchone()
+        return self._row_to_record(row)
+
+    def get_by_owner_and_hash_prefix(
+        self, extracted_text: str, image_hash: str
+    ) -> Optional[WatermarkRecord]:
+        """
+        Same heuristic as before, but using SQL instead of dicts:
+        1. Try exact hash match and check owner_id vs extracted_text.
+        2. Fallback: any row where owner_id LIKE '%%extracted_text%%'.
+        """
+
+        # 1) Exact hash match first
+        cur = self.conn.execute(
+            "SELECT * FROM watermarks WHERE image_hash = ? LIMIT 1;", (image_hash,)
+        )
+        row = cur.fetchone()
+        rec = self._row_to_record(row)
+        if rec:
+            if rec.owner_id in extracted_text or extracted_text in rec.owner_id:
+                return rec
+
+        # 2) Fallback search on owner_id
+        like_pattern = f"%{extracted_text}%"
+        cur = self.conn.execute(
+            "SELECT * FROM watermarks WHERE owner_id LIKE ? LIMIT 1;",
+            (like_pattern,),
+        )
+        row = cur.fetchone()
+        return self._row_to_record(row)
