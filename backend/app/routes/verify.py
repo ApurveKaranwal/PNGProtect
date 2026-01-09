@@ -5,7 +5,7 @@ from app.services.watermarking import (
     load_image_from_bytes,
 )
 from app.storage.db import WatermarkStore
-from app.models.schemas import VerifyResponse, PublicVerifyResponse
+from app.models.schemas import VerifyResponse, PublicVerifyResponse, WatermarkDetectionResponse
 
 router = APIRouter()
 store = WatermarkStore.get_instance()
@@ -45,8 +45,11 @@ async def verify_image(
     # If some text was reconstructed, try to match it with metadata
     record = store.get_by_owner_and_hash_prefix(extracted_text, image_hash)
 
-    watermark_found = record is not None
-    owner_id = record.owner_id if record else None
+    # Consider watermark found if:
+    # 1. We found a stored record, OR
+    # 2. LSB extraction matches pattern (>0.5 ratio) and extracted valid text
+    watermark_found = record is not None or (match_ratio > 0.5 and extracted_text != "Unknown")
+    owner_id = record.owner_id if record else (extracted_text if extracted_text != "Unknown" else None)
 
     # Confidence and tamper logic:
     # - match_ratio: fraction of bits matching expected pattern
@@ -103,3 +106,54 @@ async def public_lookup(watermark_id: str):
         strength=record.strength,
         created_at=record.timestamp,
     )
+
+@router.post(
+    "/detect",
+    response_model=WatermarkDetectionResponse,
+    summary="Detect if image already has a watermark",
+)
+async def detect_watermark(file: UploadFile = File(...)):
+    """
+    Quick detection endpoint to check if an image already contains a watermark.
+    Returns has_watermark flag and extracted text/ratio.
+    Useful for preventing re-watermarking of already watermarked images.
+    """
+    validate_image_upload(file)
+    raw_bytes = await file.read()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Empty image payload.")
+
+    try:
+        image = load_image_from_bytes(raw_bytes)
+        extracted_text, match_ratio = extract_watermark_lsb(image)
+        
+        # Get image hash to check watermark store
+        image_hash = sha256_bytes(raw_bytes)
+        
+        # Check if image has watermark stored in the database
+        stored_record = None
+        if extracted_text != "Unknown":
+            stored_record = store.get_by_owner_and_hash_prefix(extracted_text, image_hash)
+        
+        # Consider it a watermark if:
+        # 1. LSB match_ratio is high (> 0.5) AND text extracted, OR
+        # 2. Image found in watermark store
+        has_watermark = (match_ratio > 0.5 and extracted_text != "Unknown") or (stored_record is not None)
+        
+        if has_watermark:
+            owner_id = extracted_text if extracted_text != "Unknown" else (stored_record.owner_id if stored_record else "Unknown")
+            message = f"Image already contains a watermark. Owner ID: {owner_id}. Cannot re-watermark."
+        else:
+            message = "Image is clean and ready to be watermarked."
+        
+        return WatermarkDetectionResponse(
+            has_watermark=has_watermark,
+            extracted_text=extracted_text if has_watermark else "",
+            match_ratio=match_ratio,
+            message=message,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error detecting watermark: {str(e)}",
+        )

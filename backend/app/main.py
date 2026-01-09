@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import watermark, verify
+from app.routes import watermark, verify, metadata
 
 app = FastAPI(
     title="Invisible Image Watermarking API",
@@ -18,6 +18,7 @@ app.add_middleware(
 
 app.include_router(watermark.router, prefix="/watermark", tags=["Watermark"])
 app.include_router(verify.router, prefix="/verify", tags=["Verify"])
+app.include_router(metadata.router, prefix="/metadata", tags=["Metadata"])
 
 @app.get("/", tags=["Health"])
 async def root():

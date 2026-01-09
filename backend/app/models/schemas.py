@@ -38,3 +38,9 @@ class PublicVerifyResponse(BaseModel):
   image_hash: str
   strength: int
   created_at: datetime
+
+class WatermarkDetectionResponse(BaseModel):
+  has_watermark: bool
+  extracted_text: str
+  match_ratio: float
+  message: str

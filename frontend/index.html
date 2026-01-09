@@ -21,6 +21,7 @@
       <a href="#hero">Home</a>
       <a href="#watermark">Watermark</a>
       <a href="#verify">Verify</a>
+      <a href="#strip">Clean</a>
       <a href="#features">Features</a>
       <a href="#how-it-works">How it works</a>
     </nav>
@@ -213,51 +214,149 @@
       </div>
     </section>
 
+    <!-- STRIP METADATA SECTION -->
+    <section id="strip" class="section">
+      <div class="section-header">
+        <h2>Remove Metadata</h2>
+        <p>Strip all metadata and encoding from your images for privacy and clean distribution.</p>
+      </div>
+
+      <div class="layout-grid">
+        <!-- Upload -->
+        <div class="glass card">
+          <h3>Upload Image to Clean</h3>
+
+          <div id="sm-dropzone" class="dropzone">
+            <input type="file" id="sm-input" accept="image/*" hidden />
+            <div class="dropzone-inner">
+              <span class="drop-icon">🧹</span>
+              <p>Drop an image to clean</p>
+              <p class="drop-subtext">or click to browse</p>
+            </div>
+          </div>
+
+          <button id="sm-btn" class="btn primary full">
+            <span class="btn-label">Remove Metadata</span>
+            <span class="btn-spinner"></span>
+          </button>
+
+          <p class="hint">
+            Removes all EXIF data, color profiles, and encoding metadata while preserving image quality.
+          </p>
+        </div>
+
+        <!-- Result card -->
+        <div class="glass card result-card">
+          <h3>Cleaning Result</h3>
+
+          <div id="sm-status" class="status-pill status-idle">
+            Waiting for an image…
+          </div>
+
+          <div class="result-grid">
+            <div class="result-item">
+              <span class="result-label">Original Size</span>
+              <span id="sm-original-size" class="result-value">–</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Cleaned Size</span>
+              <span id="sm-cleaned-size" class="result-value">–</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Reduced by</span>
+              <span id="sm-reduction" class="result-value">–</span>
+            </div>
+          </div>
+
+          <button id="sm-download-btn" class="btn ghost full" disabled>
+            Download Cleaned Image
+          </button>
+
+          <p class="hint">
+            The cleaned image will be saved as PNG format for optimal quality.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- FEATURES SECTION -->
     <section id="features" class="section">
       <div class="section-header">
         <h2>Platform Features</h2>
-        <p>Everything you need for robust, invisible ownership signals.</p>
+        <p>Everything you need for robust, invisible ownership signals and content protection.</p>
       </div>
 
       <div class="features-grid">
         <article class="glass feature-card">
           <div class="feature-icon">☑️</div>
-          <h3>Invisible watermarking</h3>
+          <h3>Invisible Watermarking</h3>
           <p>
-            Embed hidden identifiers into images so that viewers cannot visually detect them, yet algorithms can reliably recover ownership data.
+            Embed hidden ownership identifiers into images using LSB steganography. The watermark is imperceptible to the human eye while remaining machine-readable and extractable for verification purposes.
           </p>
         </article>
 
         <article class="glass feature-card">
           <div class="feature-icon">🪪</div>
-          <h3>Ownership proof</h3>
+          <h3>Ownership Proof & Attribution</h3>
           <p>
-            Link content to creators or organizations by encoding IDs, licenses, or provenance references into the media itself.
+            Cryptographically link content to creators through encoded owner IDs, email addresses, or unique identifiers. Establish verifiable provenance and attribution chains for digital assets.
           </p>
         </article>
 
         <article class="glass feature-card">
           <div class="feature-icon">🛡️</div>
-          <h3>Tamper detection</h3>
+          <h3>Tamper Detection & Integrity</h3>
           <p>
-            Detect suspicious edits when recovered watermark patterns deviate from what was originally embedded in the asset.
+            Automatically detect suspicious modifications when watermark patterns deviate from original values. Receive detailed confidence scores and tamper status reports for each verification.
+          </p>
+        </article>
+
+        <article class="glass feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Configurable Strength Levels</h3>
+          <p>
+            Fine-tune watermark robustness from 1-10. Higher strength = greater resilience to compression and edits, lower strength = minimal visual impact. Adapt to your specific use case requirements.
+          </p>
+        </article>
+
+        <article class="glass feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Real-Time Verification</h3>
+          <p>
+            Instantly verify watermarks and recover owner IDs from any image file. Get immediate feedback on watermark presence, extraction confidence, and asset integrity status in real-time.
           </p>
         </article>
 
         <article class="glass feature-card">
           <div class="feature-icon">📦</div>
-          <h3>Bulk watermarking</h3>
+          <h3>Batch Processing Ready</h3>
           <p>
-            Process large image batches in production pipelines where each asset receives a consistent yet unique invisible watermark.
+            Integrate with production pipelines and asset management systems. Process thousands of images automatically, assigning unique identifiers while maintaining consistent quality and performance.
           </p>
         </article>
 
         <article class="glass feature-card">
           <div class="feature-icon">🌐</div>
-          <h3>Public verification</h3>
+          <h3>Public Verification API</h3>
           <p>
-            Allow anyone to verify whether an image carries a valid watermark and obtain public ownership information when appropriate.
+            Allow anyone to verify content authenticity without private keys. Share public verification endpoints for transparency while maintaining creator privacy and control over sensitive metadata.
+          </p>
+        </article>
+
+        <article class="glass feature-card">
+          <div class="feature-icon">🧹</div>
+          <h3>Metadata Stripping</h3>
+          <p>
+            Remove EXIF data, color profiles, and all encoding metadata from images for privacy and clean distribution. Keep only essential pixel data while preserving image quality.
+          </p>
+        </article>
+
+        <article class="glass feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Detailed Analytics</h3>
+          <p>
+            Comprehensive reporting including match ratios, confidence scores, extraction data, and modification detection. Track watermark resilience across different compression formats and edits.
+          </p>
         </article>
       </div>
     </section>
@@ -265,34 +364,65 @@
     <!-- HOW IT WORKS -->
     <section id="how-it-works" class="section">
       <div class="section-header">
-        <h2>How it works</h2>
-        <p>A simple flow designed for creators, platforms, and tools.</p>
+        <h2>How it Works</h2>
+        <p>A sophisticated yet simple flow designed for creators, platforms, content managers, and verification tools.</p>
       </div>
 
       <div class="steps-grid">
         <div class="glass step-card">
           <div class="step-number">01</div>
-          <h3>Upload image</h3>
+          <h3>Select & Configure</h3>
           <p>
-            Start with any supported image and choose an owner ID or reference to embed alongside it as hidden metadata.
+            Upload your image and provide an owner ID, email, or unique identifier to embed. Choose watermark strength (1-10) based on your resilience requirements and quality constraints.
           </p>
         </div>
 
         <div class="glass step-card">
           <div class="step-number">02</div>
-          <h3>Embed invisible data</h3>
+          <h3>Embed Watermark</h3>
           <p>
-            Watermarking algorithms subtly modify pixel values or frequency components to inject robust, machine-readable signals.
+            Our LSB steganography algorithm embeds your identification data into the least significant bits of pixel values. The modification is imperceptible but robust enough to survive compression and minor edits.
           </p>
         </div>
 
         <div class="glass step-card">
           <div class="step-number">03</div>
-          <h3>Verify anytime</h3>
+          <h3>Download & Distribute</h3>
           <p>
-            Anyone with a verifier can later scan the image to recover the watermark and confirm ownership or trace distribution.
+            Receive your watermarked image as a PNG file. The watermark persists through storage, sharing, and distribution. Share freely knowing your ownership is encoded within.
           </p>
         </div>
+
+        <div class="glass step-card">
+          <div class="step-number">04</div>
+          <h3>Verify Ownership</h3>
+          <p>
+            Upload any image to the verification section. The system extracts and analyzes embedded watermarks, returning the recovered owner ID and confidence scores instantly.
+          </p>
+        </div>
+
+        <div class="glass step-card">
+          <div class="step-number">05</div>
+          <h3>Detect Modifications</h3>
+          <p>
+            Receive detailed analysis of watermark integrity. See if the image is intact, slightly modified, or heavily tampered with based on pattern matching and deviation analysis.
+          </p>
+        </div>
+
+        <div class="glass step-card">
+          <div class="step-number">06</div>
+          <h3>Manage at Scale</h3>
+          <p>
+            Integrate our API into your workflow. Process thousands of images, track ownership chains, and maintain provenance records across your entire content library automatically.
+          </p>
+        </div>
+      </div>
+
+      <div class="workflow-info" style="margin-top: 3rem; padding: 2rem; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.2); border-radius: 12px;">
+        <h3 style="margin-top: 0; color: #60a5fa;">Why LSB Steganography?</h3>
+        <p style="margin-bottom: 0;">
+          Our platform uses Least Significant Bit (LSB) steganography because it offers the perfect balance between invisibility and robustness. By modifying only the least significant bits of pixel data, we achieve watermarks that are completely imperceptible to the human eye while remaining extractable by algorithms. This technique has proven effective across professional applications in digital forensics, content authentication, and copyright protection.
+        </p>
       </div>
     </section>
   </main>

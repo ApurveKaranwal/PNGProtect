@@ -270,51 +270,241 @@ wmApplyBtn.addEventListener("click", async () => {
   wmApplyBtn.classList.add("loading");
   wmApplyBtn.disabled = true;
 
-  // Simulate network / processing delay
-  await new Promise((res) => setTimeout(res, 1200 + Math.random() * 800));
+  try {
+    // First, compute file hash to check against localStorage store
+    const fileHash = await hashFile(currentWMFile);
+    
+    // Check if this image has already been watermarked (stored in localStorage)
+    if (watermarkStore.has(fileHash)) {
+      const existingWatermark = watermarkStore.get(fileHash);
+      wmApplyBtn.classList.remove("loading");
+      wmApplyBtn.disabled = false;
 
-  const hash = await hashFile(currentWMFile);
-  const strength = Number(wmStrengthInput.value);
+      // Show error state
+      wmOwnerInput.classList.add("shake");
+      setTimeout(() => wmOwnerInput.classList.remove("shake"), 400);
 
-  // Store "watermark" in memory
-  watermarkStore.set(hash, {
-    ownerId,
-    strength,
-    timestamp: Date.now(),
-  });
-  // Persist to localStorage so verification survives page reloads
-  saveStoreToStorage(watermarkStore);
+      // Create and show error popup
+      const errorDiv = document.createElement("div");
+      errorDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(185, 28, 28, 0.95);
+        color: #fecaca;
+        padding: 16px 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(248, 113, 113, 0.8);
+        box-shadow: 0 0 30px rgba(185, 28, 28, 0.6);
+        max-width: 400px;
+        z-index: 10000;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease-out;
+      `;
+      errorDiv.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 4px;">⚠️ Image Already Watermarked</div>
+        <div>This image was previously watermarked with owner ID: <strong>${existingWatermark.ownerId}</strong>. Cannot re-watermark.</div>
+      `;
+      document.body.appendChild(errorDiv);
 
-  // For demo we just reuse the original image; in real system watermarked binary differs
-  loadImagePreview(currentWMFile, wmPreviewWatermarked);
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        errorDiv.style.animation = "slideOut 0.3s ease-out";
+        setTimeout(() => errorDiv.remove(), 300);
+      }, 5000);
 
-  // Enable download button and set a reasonable filename
-  if (wmDownloadBtn) {
-    const safeOwner = ownerId.replace(/[^a-zA-Z0-9-_.]/g, "-") || "owner";
-    const downloadFilename = `${safeOwner}-${currentWMFile.name}`;
-    wmDownloadBtn.disabled = false;
-    wmDownloadBtn.dataset.filename = downloadFilename;
+      return;
+    }
+
+    // Also check with backend for additional validation
+    const formDataDetect = new FormData();
+    formDataDetect.append("file", currentWMFile);
+
+    console.log("Checking watermark detection with backend...");
+    const detectResponse = await fetch("http://localhost:8000/verify/detect", {
+      method: "POST",
+      body: formDataDetect,
+    });
+
+    if (!detectResponse.ok) {
+      const errorText = await detectResponse.text();
+      console.error("Backend detection error:", errorText);
+      throw new Error(`Failed to check for existing watermark: ${errorText}`);
+    }
+
+    const detection = await detectResponse.json();
+    console.log("Backend detection result:", detection);
+
+    // If backend also detects a watermark, show error and stop
+    if (detection.has_watermark) {
+      console.warn("Watermark detected - blocking re-watermarking");
+      wmApplyBtn.classList.remove("loading");
+      wmApplyBtn.disabled = false;
+
+      // Show error state
+      wmOwnerInput.classList.add("shake");
+      setTimeout(() => wmOwnerInput.classList.remove("shake"), 400);
+
+      // Create and show error popup
+      const errorDiv = document.createElement("div");
+      errorDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(185, 28, 28, 0.95);
+        color: #fecaca;
+        padding: 16px 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(248, 113, 113, 0.8);
+        box-shadow: 0 0 30px rgba(185, 28, 28, 0.6);
+        max-width: 400px;
+        z-index: 10000;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease-out;
+      `;
+      errorDiv.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 4px;">⚠️ Image Already Watermarked</div>
+        <div>${detection.message}</div>
+      `;
+      document.body.appendChild(errorDiv);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        errorDiv.style.animation = "slideOut 0.3s ease-out";
+        setTimeout(() => errorDiv.remove(), 300);
+      }, 5000);
+
+      return;
+    }
+    
+    console.log("No watermark detected - proceeding with watermarking");
+
+    // Now send to backend to actually embed the watermark
+    const strength = Number(wmStrengthInput.value);
+    // Map strength slider (1-100) to watermark strength (1-10)
+    const watermarkStrength = Math.max(1, Math.min(10, Math.ceil(strength / 10)));
+    
+    const formDataEmbed = new FormData();
+    formDataEmbed.append("file", currentWMFile);
+    formDataEmbed.append("owner_id", ownerId);
+    formDataEmbed.append("strength", String(watermarkStrength));
+
+    const embedResponse = await fetch("http://localhost:8000/watermark/embed", {
+      method: "POST",
+      body: formDataEmbed,
+    });
+
+    if (!embedResponse.ok) {
+      const errorText = await embedResponse.text();
+      throw new Error(`Failed to embed watermark into image: ${errorText}`);
+    }
+
+    // Get the watermarked image blob
+    const watermarkedBlob = await embedResponse.blob();
+
+    // Display the watermarked preview
+    const watermarkedUrl = URL.createObjectURL(watermarkedBlob);
+    wmPreviewWatermarked.src = watermarkedUrl;
+
+    // Store watermark metadata in localStorage
+    watermarkStore.set(fileHash, {
+      ownerId,
+      strength: watermarkStrength,
+      timestamp: Date.now(),
+      watermarkedImageUrl: watermarkedUrl,
+    });
+    saveStoreToStorage(watermarkStore);
+
+    // Enable download button and set a reasonable filename
+    if (wmDownloadBtn) {
+      const safeOwner = ownerId.replace(/[^a-zA-Z0-9-_.]/g, "-") || "owner";
+      const downloadFilename = `${safeOwner}-watermarked-${currentWMFile.name}`;
+      wmDownloadBtn.disabled = false;
+      wmDownloadBtn.dataset.filename = downloadFilename;
+      wmDownloadBtn.dataset.blobUrl = watermarkedUrl;
+    }
+
+    // Activate watermarked view
+    previewToggleButtons.forEach((b) => {
+      const mode = b.getAttribute("data-preview-mode");
+      b.classList.toggle("chip-active", mode === "watermarked");
+    });
+    wmPreviewOriginal.style.display = "none";
+    wmPreviewWatermarked.style.display = "block";
+
+    // End loading
+    wmApplyBtn.classList.remove("loading");
+    wmApplyBtn.disabled = false;
+
+    // Small affordance: briefly highlight the watermarked preview
+    wmPreviewWatermarked.style.transform = "scale(1.02)";
+    wmPreviewWatermarked.style.opacity = "0.85";
+    setTimeout(() => {
+      wmPreviewWatermarked.style.transform = "";
+      wmPreviewWatermarked.style.opacity = "1";
+    }, 320);
+
+    // Show success notification
+    const successDiv = document.createElement("div");
+    successDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(22, 163, 74, 0.95);
+      color: #bbf7d0;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(34, 197, 94, 0.85);
+      box-shadow: 0 0 30px rgba(22, 163, 74, 0.5);
+      max-width: 400px;
+      z-index: 10000;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease-out;
+    `;
+    successDiv.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px;">✓ Watermark Applied</div>
+      <div>Image successfully watermarked with owner ID: ${ownerId}</div>
+    `;
+    document.body.appendChild(successDiv);
+
+    setTimeout(() => {
+      successDiv.style.animation = "slideOut 0.3s ease-out";
+      setTimeout(() => successDiv.remove(), 300);
+    }, 4000);
+  } catch (error) {
+    wmApplyBtn.classList.remove("loading");
+    wmApplyBtn.disabled = false;
+
+    console.error("Watermarking error:", error);
+
+    // Show error notification
+    const errorDiv = document.createElement("div");
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(185, 28, 28, 0.95);
+      color: #fecaca;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(248, 113, 113, 0.8);
+      box-shadow: 0 0 30px rgba(185, 28, 28, 0.6);
+      max-width: 400px;
+      z-index: 10000;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease-out;
+    `;
+    errorDiv.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px;">✗ Error</div>
+      <div>Failed to process watermark: ${error.message}</div>
+    `;
+    document.body.appendChild(errorDiv);
+
+    setTimeout(() => {
+      errorDiv.style.animation = "slideOut 0.3s ease-out";
+      setTimeout(() => errorDiv.remove(), 300);
+    }, 5000);
   }
-
-  // Activate watermarked view
-  previewToggleButtons.forEach((b) => {
-    const mode = b.getAttribute("data-preview-mode");
-    b.classList.toggle("chip-active", mode === "watermarked");
-  });
-  wmPreviewOriginal.style.display = "none";
-  wmPreviewWatermarked.style.display = "block";
-
-  // End loading
-  wmApplyBtn.classList.remove("loading");
-  wmApplyBtn.disabled = false;
-
-  // Small affordance: briefly highlight the watermarked preview
-  wmPreviewWatermarked.style.transform = "scale(1.02)";
-  wmPreviewWatermarked.style.opacity = "0.85";
-  setTimeout(() => {
-    wmPreviewWatermarked.style.transform = "";
-    wmPreviewWatermarked.style.opacity = "1";
-  }, 320);
 });
 
 // =============================
@@ -339,7 +529,7 @@ setupDropzone(vfDropzone, vfInput, (file) => {
   vfStatus.className = "status-pill status-idle";
 });
 
-// Verify action simulation
+// Verify action - Real backend verification
 vfBtn.addEventListener("click", async () => {
   if (!currentVfFile) {
     vfDropzone.classList.add("drag-over");
@@ -356,41 +546,94 @@ vfBtn.addEventListener("click", async () => {
   // Keep bars animating as if "processing"
   vfBars.style.opacity = "1";
 
-  await new Promise((res) => setTimeout(res, 1100 + Math.random() * 900));
+  try {
+    // Send to backend for verification
+    const formData = new FormData();
+    formData.append("file", currentVfFile);
 
-  const hash = await hashFile(currentVfFile);
-  const record = watermarkStore.get(hash);
+    console.log("Verifying watermark with backend...");
+    const response = await fetch("http://localhost:8000/verify", {
+      method: "POST",
+      body: formData,
+    });
 
-  // Fake confidence generator:
-  //   If found: 85–99%
-  //   If not: 8–35%
-  let confidence;
-  if (record) {
-    confidence = 85 + Math.round(Math.random() * 14);
-  } else {
-    confidence = 8 + Math.round(Math.random() * 27);
-  }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Backend verification error:", errorText);
+      throw new Error(`Verification failed: ${errorText}`);
+    }
 
-  if (record) {
-    vfStatus.textContent = "Watermark verified";
-    vfStatus.className = "status-pill status-success";
-    vfDetected.textContent = "Yes";
-    vfOwner.textContent = record.ownerId;
-    vfConfidence.textContent = `${confidence}%`;
-  } else {
-    vfStatus.textContent = "No known watermark found";
+    const result = await response.json();
+    console.log("Backend verification result:", result);
+
+    // Extract values from response
+    const watermarkFound = result.watermark_found;
+    const ownerID = result.owner_id || "Unknown";
+    const extractedText = result.extracted_text || "Unknown";
+    const matchRatio = result.match_ratio || 0;
+    const confidence = result.confidence || 0;
+
+    // Display results
+    if (watermarkFound) {
+      vfStatus.textContent = "✓ Watermark verified";
+      vfStatus.className = "status-pill status-success";
+      vfDetected.textContent = "Yes";
+      vfOwner.textContent = ownerID !== "Unknown" ? ownerID : extractedText;
+      vfConfidence.textContent = `${confidence}%`;
+      console.log(`Watermark found - Owner: ${ownerID}, Extracted: ${extractedText}, Match: ${matchRatio}`);
+    } else {
+      vfStatus.textContent = "✗ No watermark detected";
+      vfStatus.className = "status-pill status-error";
+      vfDetected.textContent = "No";
+      vfOwner.textContent = "None";
+      vfConfidence.textContent = `${confidence}%`;
+      console.log("No watermark found");
+    }
+
+    // Brief accent animation on bars to emphasize result
+    vfBars.classList.add("flash");
+    setTimeout(() => vfBars.classList.remove("flash"), 400);
+
+  } catch (error) {
+    console.error("Verification error:", error);
+    vfStatus.textContent = "✗ Verification failed";
     vfStatus.className = "status-pill status-error";
-    vfDetected.textContent = "No";
-    vfOwner.textContent = "Unknown";
-    vfConfidence.textContent = `${confidence}%`;
+    vfDetected.textContent = "Error";
+    vfOwner.textContent = error.message;
+    vfConfidence.textContent = "0%";
+    
+    // Show error notification
+    const errorDiv = document.createElement("div");
+    errorDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(185, 28, 28, 0.95);
+      color: #fecaca;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(248, 113, 113, 0.8);
+      box-shadow: 0 0 30px rgba(185, 28, 28, 0.6);
+      max-width: 400px;
+      z-index: 10000;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease-out;
+    `;
+    errorDiv.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px;">✗ Verification Error</div>
+      <div>${error.message}</div>
+    `;
+    document.body.appendChild(errorDiv);
+    
+    setTimeout(() => {
+      errorDiv.style.animation = "slideOut 0.3s ease-out";
+      setTimeout(() => errorDiv.remove(), 300);
+    }, 5000);
+
+  } finally {
+    vfBtn.classList.remove("loading");
+    vfBtn.disabled = false;
   }
-
-  // Brief accent animation on bars to emphasize result
-  vfBars.classList.add("flash");
-  setTimeout(() => vfBars.classList.remove("flash"), 400);
-
-  vfBtn.classList.remove("loading");
-  vfBtn.disabled = false;
 });
 
 // Download button behavior for watermarked preview
@@ -425,3 +668,116 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+// =============================
+// Strip Metadata section logic
+// =============================
+
+const smDropzone = document.getElementById("sm-dropzone");
+const smInput = document.getElementById("sm-input");
+const smBtn = document.getElementById("sm-btn");
+const smStatus = document.getElementById("sm-status");
+const smOriginalSize = document.getElementById("sm-original-size");
+const smCleanedSize = document.getElementById("sm-cleaned-size");
+const smReduction = document.getElementById("sm-reduction");
+const smDownloadBtn = document.getElementById("sm-download-btn");
+
+let currentSmFile = null;
+let cleanedImageBlob = null;
+
+// Setup drag & drop for metadata stripping upload
+setupDropzone(smDropzone, smInput, (file) => {
+  currentSmFile = file;
+  smStatus.textContent = "Ready to clean";
+  smStatus.className = "status-pill status-idle";
+  smOriginalSize.textContent = formatFileSize(file.size);
+  smCleanedSize.textContent = "–";
+  smReduction.textContent = "–";
+  cleanedImageBlob = null;
+  smDownloadBtn.disabled = true;
+});
+
+// Format bytes to human readable size
+function formatFileSize(bytes) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+}
+
+// Strip metadata action
+smBtn.addEventListener("click", async () => {
+  if (!currentSmFile) {
+    smDropzone.classList.add("drag-over");
+    setTimeout(() => smDropzone.classList.remove("drag-over"), 600);
+    return;
+  }
+
+  smBtn.classList.add("loading");
+  smBtn.disabled = true;
+
+  smStatus.textContent = "Removing metadata…";
+  smStatus.className = "status-pill status-idle";
+
+  try {
+    // Create FormData and send to backend
+    const formData = new FormData();
+    formData.append("file", currentSmFile);
+
+    const response = await fetch("http://localhost:8000/metadata/strip", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    // Get the cleaned image as a blob
+    cleanedImageBlob = await response.blob();
+    const cleanedSize = cleanedImageBlob.size;
+    const originalSize = currentSmFile.size;
+    const reduction = originalSize - cleanedSize;
+    const reductionPercent = ((reduction / originalSize) * 100).toFixed(1);
+
+    // Update UI with results
+    smStatus.textContent = "Metadata successfully removed!";
+    smStatus.className = "status-pill status-success";
+    smCleanedSize.textContent = formatFileSize(cleanedSize);
+    smReduction.textContent = `${reductionPercent}%`;
+
+    // Enable download button
+    smDownloadBtn.disabled = false;
+
+    // Brief accent animation
+    smDownloadBtn.style.transform = "scale(1.05)";
+    setTimeout(() => {
+      smDownloadBtn.style.transform = "";
+    }, 200);
+  } catch (error) {
+    smStatus.textContent = "Error removing metadata";
+    smStatus.className = "status-pill status-error";
+    console.error("Metadata stripping error:", error);
+  }
+
+  smBtn.classList.remove("loading");
+  smBtn.disabled = false;
+});
+
+// Download cleaned image
+smDownloadBtn.addEventListener("click", () => {
+  if (!cleanedImageBlob) return;
+
+  const filename = currentSmFile.name
+    ? `cleaned_${currentSmFile.name}`
+    : "cleaned_image.png";
+
+  const url = URL.createObjectURL(cleanedImageBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
