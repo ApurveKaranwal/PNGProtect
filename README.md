@@ -1,6 +1,6 @@
 
 
- PNGProtect 🛡️
+ # PNGProtect 🛡️
 
 [![GitHub Stars](https://img.shields.io/github/stars/ApurveKaranwal/PNGProtect?style=social)](https://github.com/ApurveKaranwal/PNGProtect)
 [![License](https://img.shields.io/github/license/ApurveKaranwal/PNGProtect)](LICENSE)
@@ -48,59 +48,65 @@ Ideal for **digital artists, photographers, SaaS platforms, and content creators
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
-
----
+```
 
 The backend server will start in development mode.
 
-🌐 Live Demo
+## 🌐 Live Demo
+
 Frontend
 🔗 https://pngprotect.netlify.app/
 
 Backend API
 🔗 https://pngprotect.onrender.com/
 
-🛡️ Security Considerations
+
+## 🛡️ Security Considerations
+
+
 PNGProtect adds a strong layer of security, but best practices must still be followed:
 
-Key Management
-Never hardcode encryption or protection keys in source code.
+- **Key Management**
+  Never hardcode encryption or protection keys in source code.
 
-Backups
-Always retain original image backups. Some protection methods may be irreversible if keys are lost.
+- **Backups**
+  Always retain original image backups. Some protection methods may be irreversible if keys are lost.
 
-Layered Security
-For maximum protection, combine PNGProtect with authentication and access-control mechanisms.
+- **Layered Security**
+  For maximum protection, combine PNGProtect with authentication and access-control mechanisms.
 
-🤝 Contributing
-Contributions are welcome and appreciated!
-They help improve PNGProtect and strengthen the open-source community.
+## 🤝 Contributing
 
-Contribution Workflow
-Fork the repository
+  - Contributions are welcome and appreciated!
+  - They help improve PNGProtect and strengthen the open-source community.
 
-Create a feature branch
+ ### Contribution Workflow
+ 1. Fork the repository
 
-bash
-Copy code
+2. Create a feature branch
+```bash
 git checkout -b feature/AmazingFeature
-Commit your changes
 
-bash
-Copy code
+```
+3. Commit your changes
+```bash
+
 git commit -m "Add AmazingFeature"
-Push to your branch
-
-bash
-Copy code
+```
+4. Push to your branch
+```bash
 git push origin feature/AmazingFeature
-Open a Pull Request
+```
+
+5. Open a Pull Request
 
 ⚠️ Please do not commit directly to the main branch.
 
-📄 License
+## 📄 License
+
 This project is licensed under the MIT License.
 See the LICENSE file for more details.
 
-❤️ Credits
+## ❤️ Credits
+
 Built with passion by Team ZeroGlitch
