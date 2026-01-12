@@ -1,4 +1,133 @@
 // =============================
+// Professional Authentication System
+// =============================
+
+// Global API_BASE for all scripts
+const API_BASE = 'http://127.0.0.1:8001';
+
+// Initialize authentication on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  await initializeAuth();
+});
+
+async function initializeAuth() {
+  const token = localStorage.getItem('pngprotect_token');
+  
+  if (!token) {
+    showUnauthenticatedState();
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (response.ok) {
+      const user = await response.json();
+      showAuthenticatedState(user);
+    } else {
+      // Token is invalid
+      localStorage.removeItem('pngprotect_token');
+      showUnauthenticatedState();
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    showUnauthenticatedState();
+  }
+}
+
+function showUnauthenticatedState() {
+  // Show login/register buttons
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
+  const userWelcome = document.getElementById('user-welcome');
+  const dashboardLink = document.getElementById('dashboard-link');
+  const logoutBtn = document.getElementById('logout-btn');
+  const heroDashboardBtn = document.getElementById('hero-dashboard-btn');
+  
+  if (loginBtn) loginBtn.style.display = 'inline-block';
+  if (registerBtn) registerBtn.style.display = 'inline-block';
+  if (userWelcome) userWelcome.style.display = 'none';
+  if (dashboardLink) dashboardLink.style.display = 'none';
+  if (logoutBtn) logoutBtn.style.display = 'none';
+  if (heroDashboardBtn) heroDashboardBtn.style.display = 'none';
+}
+
+function showAuthenticatedState(user) {
+  // Show user info and dashboard access
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
+  const userWelcome = document.getElementById('user-welcome');
+  const dashboardLink = document.getElementById('dashboard-link');
+  const logoutBtn = document.getElementById('logout-btn');
+  const heroDashboardBtn = document.getElementById('hero-dashboard-btn');
+  
+  if (loginBtn) loginBtn.style.display = 'none';
+  if (registerBtn) registerBtn.style.display = 'none';
+  if (userWelcome) {
+    userWelcome.textContent = `Welcome, ${user.full_name}`;
+    userWelcome.style.display = 'inline-block';
+  }
+  if (dashboardLink) dashboardLink.style.display = 'inline-block';
+  if (logoutBtn) {
+    logoutBtn.style.display = 'inline-block';
+    logoutBtn.addEventListener('click', handleLogout);
+  }
+  if (heroDashboardBtn) heroDashboardBtn.style.display = 'inline-block';
+}
+
+function handleLogout() {
+  localStorage.removeItem('pngprotect_token');
+  showUnauthenticatedState();
+  
+  // Show logout notification
+  showNotification('Logged out successfully', 'success');
+}
+
+// Simple notification system for the main page
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `main-notification ${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+    background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Add notification animations
+const notificationStyle = document.createElement('style');
+notificationStyle.textContent = `
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+`;
+document.head.appendChild(notificationStyle);
+
+// =============================
 // Utility: Smooth scroll on custom buttons
 // =============================
 
@@ -90,16 +219,73 @@ document.querySelectorAll("[data-scroll]").forEach((btn) => {
 // Front-end only simulation: store "watermark" metadata in memory
 // =============================
 
-const wmDropzone = document.getElementById("wm-dropzone");
-const wmInput = document.getElementById("wm-input");
-const wmOwnerInput = document.getElementById("wm-owner-id");
-const wmStrengthInput = document.getElementById("wm-strength");
-const wmStrengthLabel = document.getElementById("wm-strength-label");
-const wmApplyBtn = document.getElementById("wm-apply-btn");
-const wmPreviewPlaceholder = document.getElementById("wm-preview-placeholder");
-const wmPreviewOriginal = document.getElementById("wm-preview-original");
-const wmPreviewWatermarked = document.getElementById("wm-preview-watermarked");
-const wmDownloadBtn = document.getElementById("wm-download-btn");
+// Global drag & drop setup function
+function setupDropzone(dropzoneEl, inputEl, onFileSelected) {
+  if (!dropzoneEl || !inputEl) {
+    console.log('Dropzone elements not found, skipping setup');
+    return;
+  }
+  
+  dropzoneEl.addEventListener("click", () => inputEl.click());
+
+  dropzoneEl.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneEl.classList.add("drag-over");
+  });
+  dropzoneEl.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneEl.classList.add("drag-over");
+  });
+  dropzoneEl.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneEl.classList.remove("drag-over");
+  });
+  dropzoneEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzoneEl.classList.remove("drag-over");
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      onFileSelected(file);
+    }
+  });
+
+  inputEl.addEventListener("change", () => {
+    const file = inputEl.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      onFileSelected(file);
+    }
+  });
+}
+
+// Initialize watermark functionality only if elements exist
+function initWatermarkFunctionality() {
+  const wmDropzone = document.getElementById("wm-dropzone");
+  const wmInput = document.getElementById("wm-input");
+  const wmOwnerInput = document.getElementById("wm-owner-id");
+  const wmStrengthInput = document.getElementById("wm-strength");
+  const wmStrengthLabel = document.getElementById("wm-strength-label");
+  const wmApplyBtn = document.getElementById("wm-apply-btn");
+  const wmPreviewPlaceholder = document.getElementById("wm-preview-placeholder");
+  const wmPreviewOriginal = document.getElementById("wm-preview-original");
+  const wmPreviewWatermarked = document.getElementById("wm-preview-watermarked");
+  const wmDownloadBtn = document.getElementById("wm-download-btn");
+
+  // Only proceed if watermark elements exist
+  if (!wmDropzone || !wmInput || !wmApplyBtn) {
+    console.log('Watermark elements not found, skipping watermark functionality');
+    return;
+  }
+
+  // Set up strength input if it exists
+  if (wmStrengthInput) {
+    updateStrengthLabel(wmStrengthInput.value);
+    wmStrengthInput.addEventListener("input", (e) =>
+      updateStrengthLabel(e.target.value)
+    );
+  }
 
 // Internal "database" of watermarked images (keyed by fake hash)
 const STORAGE_KEY = "pngprotect.watermarkStore.v1";
@@ -164,6 +350,9 @@ function loadImagePreview(file, imgEl) {
 
 // Update strength label meaningfully
 function updateStrengthLabel(value) {
+  const wmStrengthLabel = document.getElementById('wm-strength-label');
+  if (!wmStrengthLabel) return; // Exit if element doesn't exist
+  
   const val = Number(value);
   let label = "Low";
   if (val > 80) label = "Very high";
@@ -173,58 +362,21 @@ function updateStrengthLabel(value) {
   wmStrengthLabel.textContent = label;
 }
 
-updateStrengthLabel(wmStrengthInput.value);
-wmStrengthInput.addEventListener("input", (e) =>
-  updateStrengthLabel(e.target.value)
-);
-
 // Drag & drop wiring for watermark upload
-function setupDropzone(dropzoneEl, inputEl, onFileSelected) {
-  dropzoneEl.addEventListener("click", () => inputEl.click());
-
-  dropzoneEl.addEventListener("dragenter", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropzoneEl.classList.add("drag-over");
-  });
-  dropzoneEl.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropzoneEl.classList.add("drag-over");
-  });
-  dropzoneEl.addEventListener("dragleave", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropzoneEl.classList.remove("drag-over");
-  });
-  dropzoneEl.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropzoneEl.classList.remove("drag-over");
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      onFileSelected(file);
-    }
-  });
-
-  inputEl.addEventListener("change", () => {
-    const file = inputEl.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      onFileSelected(file);
-    }
-  });
-}
 
 let currentWMFile = null;
 
-// When user selects an image, show it as "original" and clear watermarked preview
-setupDropzone(wmDropzone, wmInput, (file) => {
-  currentWMFile = file;
-  wmPreviewPlaceholder.style.display = "none";
-  loadImagePreview(file, wmPreviewOriginal);
-  wmPreviewWatermarked.src = "";
-  wmPreviewWatermarked.classList.remove("visible");
-  if (wmDownloadBtn) {
-    wmDownloadBtn.disabled = true;
+  // When user selects an image, show it as "original" and clear watermarked preview
+  setupDropzone(wmDropzone, wmInput, (file) => {
+    currentWMFile = file;
+    if (wmPreviewPlaceholder) wmPreviewPlaceholder.style.display = "none";
+    loadImagePreview(file, wmPreviewOriginal);
+    if (wmPreviewWatermarked) {
+      wmPreviewWatermarked.src = "";
+      wmPreviewWatermarked.classList.remove("visible");
+    }
+    if (wmDownloadBtn) {
+      wmDownloadBtn.disabled = true;
     delete wmDownloadBtn.dataset.filename;
   }
 });
@@ -507,6 +659,26 @@ wmApplyBtn.addEventListener("click", async () => {
   }
 });
 
+  // Download button behavior for watermarked preview
+  if (wmDownloadBtn) {
+    wmDownloadBtn.addEventListener("click", () => {
+      const src = wmPreviewWatermarked.src;
+      if (!src) return;
+      const filename = wmDownloadBtn.dataset.filename || "watermarked.png";
+      const a = document.createElement("a");
+      a.href = src;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  }
+
+} // End of initWatermarkFunctionality
+
+// Call the function to initialize watermark functionality
+initWatermarkFunctionality();
+
 // =============================
 // Verify section logic
 // =============================
@@ -520,6 +692,7 @@ let lastWatermarkFound = false;
 
 const WALLET_STORAGE_KEY = "pngprotect.walletConnection.v1";
 
+// Initialize wallet elements with null checks
 const connectWalletBtn = document.getElementById("connect-wallet-btn");
 const disconnectWalletBtn = document.getElementById("disconnect-wallet-btn");
 const walletAddressSpan = document.getElementById("wallet-address");
@@ -546,6 +719,11 @@ async function fetchRegistryAbi() {
 }
 
 async function connectWallet() {
+  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan) {
+    console.log('Wallet UI elements not found, skipping wallet functionality');
+    return;
+  }
+  
   if (!window.ethereum) {
     alert("MetaMask not detected. Install MetaMask to use on-chain registration.");
     return;
@@ -574,6 +752,11 @@ async function connectWallet() {
 }
 
 function disconnectWallet() {
+  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan || !registerBtn || !registerStatus) {
+    console.log('Wallet UI elements not found, skipping disconnect');
+    return;
+  }
+  
   connectedAccount = null;
   walletAddressSpan.textContent = "Not connected";
   connectWalletBtn.style.display = "inline-block";
@@ -632,6 +815,11 @@ if (disconnectWalletBtn) {
 // Clear any residual wallet data to ensure fresh state
 // =============================
 function initializeWalletState() {
+  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan || !registerBtn || !registerStatus) {
+    console.log('Wallet UI elements not found, skipping wallet initialization');
+    return;
+  }
+  
   // Always start with wallet disconnected on page load
   // User must explicitly click "Connect Wallet" each time
   localStorage.removeItem(WALLET_STORAGE_KEY);
@@ -709,23 +897,31 @@ if (registerBtn) {
   });
 }
 
-const vfDropzone = document.getElementById("vf-dropzone");
-const vfInput = document.getElementById("vf-input");
-const vfBtn = document.getElementById("vf-btn");
-const vfStatus = document.getElementById("vf-status");
-const vfDetected = document.getElementById("vf-detected");
-const vfOwner = document.getElementById("vf-owner");
-const vfConfidence = document.getElementById("vf-confidence");
-const vfBars = document.getElementById("vf-bars");
+// Initialize verify functionality only if elements exist
+function initVerifyFunctionality() {
+  const vfDropzone = document.getElementById("vf-dropzone");
+  const vfInput = document.getElementById("vf-input");
+  const vfBtn = document.getElementById("vf-btn");
+  const vfStatus = document.getElementById("vf-status");
+  const vfDetected = document.getElementById("vf-detected");
+  const vfOwner = document.getElementById("vf-owner");
+  const vfConfidence = document.getElementById("vf-confidence");
+  const vfBars = document.getElementById("vf-bars");
 
-let currentVfFile = null;
+  // Only proceed if verify elements exist
+  if (!vfDropzone || !vfInput || !vfBtn) {
+    console.log('Verify elements not found, skipping verify functionality');
+    return;
+  }
 
-// Setup drag & drop for verification upload
-setupDropzone(vfDropzone, vfInput, (file) => {
-  currentVfFile = file;
-  vfStatus.textContent = "Ready to verify";
-  vfStatus.className = "status-pill status-idle";
-});
+  let currentVfFile = null;
+
+  // Setup drag & drop for verification upload
+  setupDropzone(vfDropzone, vfInput, (file) => {
+    currentVfFile = file;
+    vfStatus.textContent = "Ready to verify";
+    vfStatus.className = "status-pill status-idle";
+  });
 
 // Verify action - Real backend verification
 vfBtn.addEventListener("click", async () => {
@@ -850,20 +1046,10 @@ vfBtn.addEventListener("click", async () => {
   }
 });
 
-// Download button behavior for watermarked preview
-if (wmDownloadBtn) {
-  wmDownloadBtn.addEventListener("click", () => {
-    const src = wmPreviewWatermarked.src;
-    if (!src) return;
-    const filename = wmDownloadBtn.dataset.filename || "watermarked.png";
-    const a = document.createElement("a");
-    a.href = src;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  });
-}
+} // End of initVerifyFunctionality
+
+// Call the function to initialize verify functionality
+initVerifyFunctionality();
 
 // Optional: small shake animation via class toggled above
 const style = document.createElement("style");
@@ -882,33 +1068,45 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Call the function to initialize verify functionality
+initVerifyFunctionality();
+
 // =============================
 // Strip Metadata section logic
 // =============================
 
-const smDropzone = document.getElementById("sm-dropzone");
-const smInput = document.getElementById("sm-input");
-const smBtn = document.getElementById("sm-btn");
-const smStatus = document.getElementById("sm-status");
-const smOriginalSize = document.getElementById("sm-original-size");
-const smCleanedSize = document.getElementById("sm-cleaned-size");
-const smReduction = document.getElementById("sm-reduction");
-const smDownloadBtn = document.getElementById("sm-download-btn");
+// Initialize strip metadata functionality only if elements exist
+function initStripMetadataFunctionality() {
+  const smDropzone = document.getElementById("sm-dropzone");
+  const smInput = document.getElementById("sm-input");
+  const smBtn = document.getElementById("sm-btn");
+  const smStatus = document.getElementById("sm-status");
+  const smOriginalSize = document.getElementById("sm-original-size");
+  const smCleanedSize = document.getElementById("sm-cleaned-size");
+  const smReduction = document.getElementById("sm-reduction");
+  const smDownloadBtn = document.getElementById("sm-download-btn");
 
-let currentSmFile = null;
-let cleanedImageBlob = null;
+  // Only proceed if strip metadata elements exist
+  if (!smDropzone || !smInput || !smBtn) {
+    console.log('Strip metadata elements not found, skipping strip metadata functionality');
+    return;
+  }
 
-// Setup drag & drop for metadata stripping upload
-setupDropzone(smDropzone, smInput, (file) => {
-  currentSmFile = file;
-  smStatus.textContent = "Ready to clean";
-  smStatus.className = "status-pill status-idle";
-  smOriginalSize.textContent = formatFileSize(file.size);
-  smCleanedSize.textContent = "–";
-  smReduction.textContent = "–";
-  cleanedImageBlob = null;
-  smDownloadBtn.disabled = true;
-});
+  let currentSmFile = null;
+  let cleanedImageBlob = null;
+
+  // Setup drag & drop for metadata stripping upload
+  setupDropzone(smDropzone, smInput, (file) => {
+    currentSmFile = file;
+    smStatus.textContent = "Ready to clean";
+    smStatus.className = "status-pill status-idle";
+    smOriginalSize.textContent = formatFileSize(file.size);
+    smCleanedSize.textContent = "–";
+    smReduction.textContent = "–";
+    cleanedImageBlob = null;
+    smDownloadBtn.disabled = true;
+  });
 
 // Format bytes to human readable size
 function formatFileSize(bytes) {
@@ -995,3 +1193,8 @@ smDownloadBtn.addEventListener("click", () => {
   a.remove();
   URL.revokeObjectURL(url);
 });
+
+} // End of initStripMetadataFunctionality
+
+// Call the function to initialize strip metadata functionality
+initStripMetadataFunctionality();

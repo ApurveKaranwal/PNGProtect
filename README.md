@@ -1,110 +1,108 @@
-# PNGProtect 🛡️
+# 🛡️ PNGProtect
 
-[![GitHub Stars](https://img.shields.io/github/stars/ApurveKaranwal/PNGProtect?style=social)](https://github.com/ApurveKaranwal/PNGProtect)
-[![License](https://img.shields.io/github/license/ApurveKaranwal/PNGProtect)](LICENSE)
-[![Open Issues](https://img.shields.io/github/issues/ApurveKaranwal/PNGProtect)](https://github.com/ApurveKaranwal/PNGProtect/issues)
-
-**PNGProtect** is a lightweight image protection tool designed to safeguard PNG images from unauthorized downloading, screenshots, and reverse-engineering.  
-It leverages advanced obfuscation techniques, invisible overlays, and dynamic watermarking to protect digital assets **without compromising visual quality**.
-
-Ideal for **digital artists, photographers, SaaS platforms, and content creators** who require robust image protection across platforms.
-
----
+**Professional invisible watermarking system with user authentication, dashboard management, and blockchain integration.**
 
 ## ✨ Features
 
-- **Invisible Protection Layers**  
-  Embeds hidden metadata and overlays to deter scraping and reverse-engineering tools.
-
-- **Dynamic Watermarking**  
-  Automatically generates user- or session-specific watermarks.
-
-- **Screenshot Resistance**  
-  Detects and disrupts common screenshot and screen-capture methods.
-
-- **Cross-Platform Support**  
-  Works seamlessly across **web, desktop, and mobile** environments.
-
-- **Zero Dependencies**  
-  Lightweight and efficient with no external runtime dependencies.
-
-- **Highly Customizable**  
-  Flexible configuration options for different security levels and use cases.
-
----
+- **🔐 User Authentication** - JWT-like token system with role-based access
+- **🖼️ Invisible Watermarking** - Advanced steganography with adjustable strength (1-10 levels)
+- **📊 Dashboard Analytics** - User statistics, watermark history, and usage tracking
+- **🔍 Verification System** - Watermark detection with confidence scoring
+- **🧹 Metadata Stripping** - Privacy protection tool for removing image metadata
+- **⚡ Bulk Operations** - Process multiple images efficiently with templates
+- **🌐 Blockchain Integration** - MetaMask wallet connection for on-chain ownership registry
+- **📜 Smart Contracts** - Ethereum-based ownership registration system
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.9+
-- pip
-- Uvicorn
-
-### Installation & Run Locally
-
+### Backend Setup
 ```bash
-cd backend
+cd PNGProtect/backend
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The backend server will start in development mode.
+### Frontend Access
+Open `PNGProtect/frontend/index.html` in your browser or serve with any HTTP server.
 
-## 🌐 Live Demo
+### Demo Login
+- **Email**: `demo@pngprotect.com`
+- **Password**: `demo123`
 
-Frontend
-🔗 https://pngprotect.netlify.app/
+### Wallet Connection
+- Install **MetaMask** browser extension
+- Click **"Connect Wallet"** to link your Ethereum wallet
+- Register watermark ownership on-chain after verification
 
-Backend API
-🔗 https://pngprotect.onrender.com/
-
-
-## 🛡️ Security Considerations
-
-
-PNGProtect adds a strong layer of security, but best practices must still be followed:
-
-- **Key Management**
-  Never hardcode encryption or protection keys in source code.
-
-- **Backups**
-  Always retain original image backups. Some protection methods may be irreversible if keys are lost.
-
-- **Layered Security**
-  For maximum protection, combine PNGProtect with authentication and access-control mechanisms.
-
-## 🤝 Contributing
-
-  - Contributions are welcome and appreciated!
-  - They help improve PNGProtect and strengthen the open-source community.
-
- ### Contribution Workflow
- 1. Fork the repository
-
-2. Create a feature branch
-```bash
-git checkout -b feature/AmazingFeature
+## 📁 Project Structure
 
 ```
-3. Commit your changes
-```bash
-
-git commit -m "Add AmazingFeature"
+PNGProtect/
+├── backend/                 # FastAPI backend
+│   ├── app/
+│   │   ├── models/         # Data schemas
+│   │   ├── routes/         # API endpoints
+│   │   ├── services/       # Business logic
+│   │   ├── storage/        # Database layer
+│   │   └── main.py         # FastAPI app
+│   ├── contracts/          # Smart contracts (Solidity)
+│   └── requirements.txt    # Dependencies
+├── frontend/               # Web interface
+│   ├── index.html         # Home page with wallet integration
+│   ├── login.html         # Authentication
+│   ├── dashboard.html     # User dashboard
+│   ├── *.js              # JavaScript modules
+│   └── *.css             # Styling
+└── README.md             # This file
 ```
-4. Push to your branch
-```bash
-git push origin feature/AmazingFeature
-```
 
-5. Open a Pull Request
+## 🔧 API Endpoints
 
-⚠️ Please do not commit directly to the main branch.
+- **Authentication**: `/auth/login`, `/auth/register`, `/auth/me`
+- **Watermarking**: `/watermark/embed`, `/watermark/{id}`
+- **Verification**: `/verify/detect`, `/verify/extract`
+- **Dashboard**: `/dashboard/stats`, `/dashboard/analytics`
+- **Metadata**: `/metadata/strip`
+- **Blockchain Registry**: `/registry/abi` (smart contract integration)
 
-## 📄 License
+## � Blockchain Features
 
-This project is licensed under the MIT License.
-See the LICENSE file for more details.
+### Wallet Integration
+- **MetaMask Connection** - Seamless wallet linking
+- **Account Management** - Automatic account switching detection
+- **Network Support** - Ethereum mainnet and testnets
 
-## ❤️ Credits
+### On-Chain Registration
+- **Ownership Registry** - Register watermark ownership on blockchain
+- **Smart Contract** - Ethereum-based ownership verification
+- **Immutable Records** - Permanent ownership proof
 
-Built with passion by Team ZeroGlitch
+### Usage Flow
+1. **Watermark** your image using the invisible watermarking system
+2. **Verify** the watermark is properly embedded
+3. **Connect Wallet** using MetaMask
+4. **Register Ownership** on-chain for permanent proof
+
+## 🎨 Tech Stack
+
+- **Backend**: FastAPI, SQLite, Python
+- **Frontend**: Vanilla JavaScript, CSS Grid, HTML5
+- **Authentication**: JWT-like tokens, password hashing
+- **Blockchain**: ethers.js, MetaMask integration, Solidity smart contracts
+- **Styling**: Glassmorphism design, responsive layout
+
+## 🔒 Security Features
+
+- **Password Hashing** with SHA-256
+- **Session Management** with secure tokens
+- **CORS Protection** properly configured
+- **Input Validation** on all endpoints
+- **Blockchain Security** - Immutable ownership records
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+**Built for digital content protection with blockchain-verified ownership** 🛡️⛓️

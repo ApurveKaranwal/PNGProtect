@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import watermark, verify, metadata
+from app.routes import watermark, verify, metadata, auth, dashboard
 import os
 from dotenv import load_dotenv
 
@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(
-    title="Invisible Image Watermarking API",
-    description="LSB watermarking backend.",
-    version="0.1.0",
+    title="PNGProtect API",
+    description="Invisible image watermarking with user management and dashboard.",
+    version="0.2.0",
 )
 
 app.add_middleware(
@@ -21,6 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 app.include_router(watermark.router, prefix="/watermark", tags=["Watermark"])
 app.include_router(verify.router, prefix="/verify", tags=["Verify"])
 app.include_router(metadata.router, prefix="/metadata", tags=["Metadata"])
