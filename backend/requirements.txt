@@ -6,3 +6,4 @@ opencv-python
 numpy
 web3
 python-dotenv
+email-validator
