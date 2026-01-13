@@ -3,7 +3,7 @@
 // =============================
 
 // Global API_BASE for all scripts
-const API_BASE = 'http://127.0.0.1:8001';
+const API_BASE = 'http://127.0.0.1:8000';
 
 // Initialize authentication on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1198,3 +1198,217 @@ smDownloadBtn.addEventListener("click", () => {
 
 // Call the function to initialize strip metadata functionality
 initStripMetadataFunctionality();
+
+// =============================
+// Watermark Tampering Detection
+// =============================
+
+function initDetectionFunctionality() {
+  // Elements
+  const detDropzone = document.getElementById('det-dropzone');
+  const detInput = document.getElementById('det-input');
+  const detFullBtn = document.getElementById('det-full-btn');
+  const detFastBtn = document.getElementById('det-fast-btn');
+  const detStatus = document.getElementById('det-status');
+  const detConfidenceContainer = document.getElementById('det-confidence-container');
+  const detConfidenceValue = document.getElementById('det-confidence-value');
+  const detConfidenceFill = document.getElementById('det-confidence-fill');
+  const detConfidenceLevel = document.getElementById('det-confidence-level');
+  const detVerdictContainer = document.getElementById('det-verdict-container');
+  const detVerdictIcon = document.getElementById('det-verdict-icon');
+  const detVerdictTitle = document.getElementById('det-verdict-title');
+  const detVerdictText = document.getElementById('det-verdict-text');
+  const detTechniquesContainer = document.getElementById('det-techniques-container');
+  const detTechniquesList = document.getElementById('det-techniques-list');
+  const detExplanationContainer = document.getElementById('det-explanation-container');
+  const detExplanationText = document.getElementById('det-explanation-text');
+  const detTechnicalContainer = document.getElementById('det-technical-container');
+  const detTechnicalText = document.getElementById('det-technical-text');
+  const detToggleTechnical = document.getElementById('det-toggle-technical');
+
+  let currentDetFile = null;
+  let technicalDetailsVisible = false;
+
+  // Dropzone functionality
+  detDropzone.addEventListener('click', () => detInput.click());
+  detDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    detDropzone.style.borderColor = 'var(--accent-cyan)';
+    detDropzone.style.background = 'rgba(34, 211, 238, 0.05)';
+  });
+  detDropzone.addEventListener('dragleave', () => {
+    detDropzone.style.borderColor = '';
+    detDropzone.style.background = '';
+  });
+  detDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    detDropzone.style.borderColor = '';
+    detDropzone.style.background = '';
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      detInput.files = files;
+      handleDetectionFileSelect();
+    }
+  });
+
+  detInput.addEventListener('change', handleDetectionFileSelect);
+
+  function handleDetectionFileSelect() {
+    const file = detInput.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+    currentDetFile = file;
+    detDropzone.querySelector('.dropzone-inner').innerHTML = `
+      <span class="drop-icon">✅</span>
+      <p>${file.name}</p>
+      <p class="drop-subtext">${formatFileSize(file.size)}</p>
+    `;
+    detStatus.textContent = 'Ready to analyze';
+    detStatus.className = 'status-pill status-idle';
+    resetDetectionResults();
+  }
+
+  function resetDetectionResults() {
+    detConfidenceContainer.style.display = 'none';
+    detVerdictContainer.style.display = 'none';
+    detTechniquesContainer.style.display = 'none';
+    detExplanationContainer.style.display = 'none';
+    detTechnicalContainer.style.display = 'none';
+    detToggleTechnical.style.display = 'none';
+    technicalDetailsVisible = false;
+    detToggleTechnical.textContent = 'Show Technical Details';
+  }
+
+  // Analyze function
+  async function analyzeImage(mode) {
+    if (!currentDetFile) {
+      alert('Please select an image first');
+      return;
+    }
+
+    const btn = mode === 'full' ? detFullBtn : detFastBtn;
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    detStatus.textContent = mode === 'full' ? 'Running full analysis...' : 'Running forensic analysis...';
+    detStatus.className = 'status-pill status-processing';
+    resetDetectionResults();
+
+    try {
+      const formData = new FormData();
+      formData.append('file', currentDetFile);
+
+      const endpoint = mode === 'full' ? '/detect/detect' : '/detect/forensics-only';
+      const response = await fetch(API_BASE + endpoint, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      displayDetectionResults(result);
+    } catch (error) {
+      console.error('Detection error:', error);
+      detStatus.textContent = 'Error analyzing image: ' + error.message;
+      detStatus.className = 'status-pill status-error';
+    }
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+
+  function displayDetectionResults(result) {
+    const confidence = result.overall_tampering_confidence || 0;
+    const confidenceLevel = result.confidence_level || 'Unknown';
+    const likelyRemoved = result.likely_removed === true;
+
+    // Update status
+    detStatus.textContent = `Analysis complete - ${confidenceLevel} confidence`;
+    detStatus.className = confidence > 60 ? 'status-pill status-warning' : 'status-pill status-success';
+
+    // Display confidence score
+    detConfidenceContainer.style.display = 'block';
+    detConfidenceValue.textContent = `${Math.round(confidence)}%`;
+    detConfidenceFill.style.width = `${confidence}%`;
+
+    // Update color based on confidence
+    if (confidence >= 70) {
+      detConfidenceFill.style.background = 'linear-gradient(90deg, #f97373, #ff6b6b)';
+      detConfidenceLevel.textContent = `Likelihood: Very High (${confidenceLevel})`;
+    } else if (confidence >= 50) {
+      detConfidenceFill.style.background = 'linear-gradient(90deg, #facc15, #fbbf24)';
+      detConfidenceLevel.textContent = `Likelihood: Medium (${confidenceLevel})`;
+    } else if (confidence >= 30) {
+      detConfidenceFill.style.background = 'linear-gradient(90deg, #22d3ee, #06b6d4)';
+      detConfidenceLevel.textContent = `Likelihood: Low (${confidenceLevel})`;
+    } else {
+      detConfidenceFill.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
+      detConfidenceLevel.textContent = `Likelihood: Minimal (${confidenceLevel})`;
+    }
+
+    // Display verdict
+    detVerdictContainer.style.display = 'block';
+    if (likelyRemoved) {
+      detVerdictIcon.textContent = '⚠️';
+      detVerdictContainer.style.borderLeftColor = '#f97373';
+      detVerdictTitle.textContent = 'Likely Tampering Detected';
+      detVerdictText.textContent = 'The image shows signs of watermark removal or significant modification.';
+    } else if (confidence > 30) {
+      detVerdictIcon.textContent = '⚠️';
+      detVerdictContainer.style.borderLeftColor = '#facc15';
+      detVerdictTitle.textContent = 'Possible Tampering';
+      detVerdictText.textContent = 'The image may have been modified. Manual review recommended.';
+    } else {
+      detVerdictIcon.textContent = '✅';
+      detVerdictContainer.style.borderLeftColor = '#22c55e';
+      detVerdictTitle.textContent = 'Image Integrity Intact';
+      detVerdictText.textContent = 'No significant signs of watermark tampering detected.';
+    }
+
+    // Display techniques
+    if (result.detected_techniques && result.detected_techniques.length > 0) {
+      detTechniquesContainer.style.display = 'block';
+      detTechniquesList.innerHTML = result.detected_techniques
+        .map(technique => `
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
+            <span style="color: #facc15;">◆</span>
+            <span style="color: var(--text-soft);">${technique}</span>
+          </div>
+        `)
+        .join('');
+    }
+
+    // Display forensic explanation
+    if (result.forensic_explanation) {
+      detExplanationContainer.style.display = 'block';
+      detExplanationText.textContent = result.forensic_explanation;
+    }
+
+    // Store technical summary for toggle
+    if (result.technical_summary) {
+      detTechnicalContainer.style.display = 'none';
+      detTechnicalText.textContent = result.technical_summary;
+      detToggleTechnical.style.display = 'block';
+    }
+  }
+
+  // Button event listeners
+  detFullBtn.addEventListener('click', () => analyzeImage('full'));
+  detFastBtn.addEventListener('click', () => analyzeImage('fast'));
+
+  // Toggle technical details
+  detToggleTechnical.addEventListener('click', () => {
+    technicalDetailsVisible = !technicalDetailsVisible;
+    detTechnicalContainer.style.display = technicalDetailsVisible ? 'block' : 'none';
+    detToggleTechnical.textContent = technicalDetailsVisible ? 'Hide Technical Details' : 'Show Technical Details';
+  });
+}
+
+// Initialize detection functionality
+initDetectionFunctionality();
