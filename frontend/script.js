@@ -3,7 +3,7 @@
 // =============================
 
 // Global API_BASE for all scripts
-const API_BASE = 'http://127.0.0.1:8001';
+const API_BASE = 'http://127.0.0.1:8000';
 
 // Initialize authentication on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -473,7 +473,7 @@ wmApplyBtn.addEventListener("click", async () => {
     formDataDetect.append("file", currentWMFile);
 
     console.log("Checking watermark detection with backend...");
-    const detectResponse = await fetch("http://localhost:8000/verify/detect", {
+    const detectResponse = await fetch(`${API_BASE}/verify/detect`, {
       method: "POST",
       body: formDataDetect,
     });
@@ -541,8 +541,11 @@ wmApplyBtn.addEventListener("click", async () => {
     formDataEmbed.append("owner_id", ownerId);
     formDataEmbed.append("strength", String(watermarkStrength));
 
-    const embedResponse = await fetch("http://localhost:8000/watermark/embed", {
+    const embedResponse = await fetch(`${API_BASE}/watermark/embed`, {
       method: "POST",
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('pngprotect_token') || ''}`
+      },
       body: formDataEmbed,
     });
 
@@ -661,17 +664,27 @@ wmApplyBtn.addEventListener("click", async () => {
 
   // Download button behavior for watermarked preview
   if (wmDownloadBtn) {
+    console.log('Download button found, attaching event listener');
     wmDownloadBtn.addEventListener("click", () => {
+      console.log('Download button clicked!');
       const src = wmPreviewWatermarked.src;
-      if (!src) return;
+      console.log('Watermarked image src:', src);
+      if (!src) {
+        console.warn('No watermarked image source found');
+        return;
+      }
       const filename = wmDownloadBtn.dataset.filename || "watermarked.png";
+      console.log('Downloading as:', filename);
       const a = document.createElement("a");
       a.href = src;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       a.remove();
+      console.log('Download triggered');
     });
+  } else {
+    console.warn('Download button not found in DOM');
   }
 
 } // End of initWatermarkFunctionality
@@ -701,7 +714,7 @@ const registerStatus = document.getElementById("register-status");
 
 async function fetchRegistryAbi() {
   try {
-    const res = await fetch("http://localhost:8000/registry/abi");
+    const res = await fetch(`${API_BASE}/registry/abi`);
     if (!res.ok) {
       console.error("Failed to fetch registry ABI:", res.status);
       return null;
@@ -946,7 +959,7 @@ vfBtn.addEventListener("click", async () => {
     formData.append("file", currentVfFile);
 
     console.log("Verifying watermark with backend...");
-    const response = await fetch("http://localhost:8000/verify", {
+    const response = await fetch(`${API_BASE}/verify`, {
       method: "POST",
       body: formData,
     });
@@ -1136,7 +1149,7 @@ smBtn.addEventListener("click", async () => {
     const formData = new FormData();
     formData.append("file", currentSmFile);
 
-    const response = await fetch("http://localhost:8000/metadata/strip", {
+    const response = await fetch(`${API_BASE}/metadata/strip`, {
       method: "POST",
       body: formData,
     });

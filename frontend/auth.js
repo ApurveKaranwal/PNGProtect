@@ -101,6 +101,13 @@ async function handleLogin(e) {
 
 async function performLogin(email, password) {
   console.log('Performing login for:', email);
+  console.log('API_BASE value:', typeof API_BASE !== 'undefined' ? API_BASE : 'UNDEFINED');
+  
+  if (typeof API_BASE === 'undefined') {
+    console.error('API_BASE is not defined! Make sure script.js loads before auth.js');
+    showNotification('Configuration error: API_BASE not defined', 'error');
+    return;
+  }
   
   if (!email || !password) {
     showNotification('Please enter both email and password', 'error');
