@@ -1,3 +1,7 @@
+'''use 
+python -m uvicorn app.main:app --reload
+to run the server'''
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import auth, watermark, verify, metadata, detection, registry
