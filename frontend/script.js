@@ -2,12 +2,74 @@
 // Global API_BASE for all scripts
 // =============================
 
+console.log('🚀 script.js loaded');
+
 const API_BASE = 'http://127.0.0.1:8000';
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', async () => {
-  // Remove authentication check - app is now open to all users
-});
+// =============================
+// Theme Toggle Functionality
+// =============================
+
+let themeInitialized = false;
+
+function initThemeToggle() {
+  if (themeInitialized) {
+    console.log('Theme already initialized, skipping...');
+    return;
+  }
+  
+  const btn = document.getElementById('theme-toggle-btn');
+  
+  if (!btn) {
+    console.error('❌ Theme button not found');
+    return;
+  }
+  
+  console.log('✅ Theme button found, initializing...');
+  themeInitialized = true;
+  
+  // Restore saved preference
+  const saved = localStorage.getItem('theme-mode') || 'dark-mode';
+  console.log('📦 Saved theme:', saved);
+  
+  if (saved === 'light-mode') {
+    document.body.classList.add('light-mode');
+    btn.textContent = '☀️';
+  } else {
+    document.body.classList.remove('light-mode');
+    btn.textContent = '🌙';
+  }
+  
+  // Add click handler
+  btn.onclick = function(e) {
+    e.preventDefault();
+    console.log('🖱️ Button clicked!');
+    
+    const isLight = document.body.classList.contains('light-mode');
+    console.log('Current theme is light:', isLight);
+    
+    if (isLight) {
+      document.body.classList.remove('light-mode');
+      btn.textContent = '🌙';
+      localStorage.setItem('theme-mode', 'dark-mode');
+      console.log('🌙 -> Dark mode');
+    } else {
+      document.body.classList.add('light-mode');
+      btn.textContent = '☀️';
+      localStorage.setItem('theme-mode', 'light-mode');
+      console.log('☀️ -> Light mode');
+    }
+  };
+}
+
+// Wait for DOM then initialize
+if (document.readyState === 'loading') {
+  console.log('📄 DOM still loading...');
+  document.addEventListener('DOMContentLoaded', initThemeToggle);
+} else {
+  console.log('📄 DOM already loaded');
+  initThemeToggle();
+}
 
 // Simple notification system for the main page
 function showNotification(message, type = 'info') {
