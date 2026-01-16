@@ -4,7 +4,7 @@ to run the server'''
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import watermark, verify, metadata, detection, registry
+from app.routes import watermark, verify, metadata, detection, registry, protection
 import os
 from dotenv import load_dotenv
 
@@ -23,6 +23,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Robustness-Score"]
 )
 
 app.include_router(watermark.router, prefix="/watermark", tags=["Watermark"])
@@ -30,6 +31,7 @@ app.include_router(verify.router, prefix="/verify", tags=["Verify"])
 app.include_router(metadata.router, prefix="/metadata", tags=["Metadata"])
 app.include_router(detection.router, prefix="/detect", tags=["Detection"])
 app.include_router(registry.router, prefix="/registry", tags=["Registry"])
+app.include_router(protection.router, prefix="/protect", tags=["Protection"])
 
 @app.get("/", tags=["Health"])
 async def root():

@@ -8,7 +8,8 @@ from typing import Optional
 import sqlite3
 
 
-DB_PATH = Path(__file__).with_name("watermarks.db")
+import tempfile
+DB_PATH = Path(tempfile.gettempdir()) / "pngprotect_watermarks.db"
 
 
 @dataclass

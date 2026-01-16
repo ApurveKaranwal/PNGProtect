@@ -17,21 +17,21 @@ function initThemeToggle() {
     console.log('Theme already initialized, skipping...');
     return;
   }
-  
+
   const btn = document.getElementById('theme-toggle-btn');
-  
+
   if (!btn) {
     console.error('❌ Theme button not found');
     return;
   }
-  
+
   console.log('✅ Theme button found, initializing...');
   themeInitialized = true;
-  
+
   // Restore saved preference
   const saved = localStorage.getItem('theme-mode') || 'dark-mode';
   console.log('📦 Saved theme:', saved);
-  
+
   if (saved === 'light-mode') {
     document.body.classList.add('light-mode');
     btn.textContent = '☀️';
@@ -39,15 +39,15 @@ function initThemeToggle() {
     document.body.classList.remove('light-mode');
     btn.textContent = '🌙';
   }
-  
+
   // Add click handler
-  btn.onclick = function(e) {
+  btn.onclick = function (e) {
     e.preventDefault();
     console.log('🖱️ Button clicked!');
-    
+
     const isLight = document.body.classList.contains('light-mode');
     console.log('Current theme is light:', isLight);
-    
+
     if (isLight) {
       document.body.classList.remove('light-mode');
       btn.textContent = '🌙';
@@ -213,7 +213,10 @@ function setupDropzone(dropzoneEl, inputEl, onFileSelected) {
   }
 
   dropzoneEl.addEventListener("click", (e) => {
-    // e.preventDefault(); // Removed to avoid blocking legitimate interactions
+    // Prevent infinite loop if the input is inside the dropzone
+    if (e.target === inputEl) return;
+
+    // e.preventDefault(); 
     e.stopPropagation();
     console.log("Dropzone clicked, opening file picker");
     inputEl.click();
@@ -434,7 +437,8 @@ function initWatermarkFunctionality() {
     });
 
     // Apply invisible watermark simulation
-    wmApplyBtn.addEventListener("click", async () => {
+    wmApplyBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
       console.log("Watermark apply button clicked");
 
       if (!currentWMFile) {
@@ -706,6 +710,142 @@ function initWatermarkFunctionality() {
 initWatermarkFunctionality();
 
 // =============================
+// AI Shield Functionality
+// =============================
+function initAIShieldFunctionality() {
+  try {
+    console.log("===== INITIALIZING AI SHIELD FUNCTIONALITY =====");
+
+    const aisDropzone = document.getElementById("ais-dropzone");
+    const aisInput = document.getElementById("ais-input");
+    const aisStrength = document.getElementById("ais-strength");
+    const aisStrengthLabel = document.getElementById("ais-strength-label");
+    const aisBtn = document.getElementById("ais-btn");
+    const aisPreview = document.getElementById("ais-preview");
+    const aisPlaceholder = document.getElementById("ais-placeholder");
+    const aisScore = document.getElementById("ais-score");
+    const aisStatus = document.getElementById("ais-status");
+    const aisDownloadBtn = document.getElementById("ais-download-btn");
+
+    // Only proceed if elements exist
+    if (!aisDropzone || !aisInput || !aisBtn) {
+      console.log('AI Shield elements not found, skipping functionality');
+      return;
+    }
+
+    // Update strength label
+    function updateShieldLabel(val) {
+      if (!aisStrengthLabel) return;
+      let label = "Standard";
+      if (val < 20) label = "Low (Invisible)";
+      else if (val < 50) label = "Standard (Balanced)";
+      else if (val < 80) label = "High (Strong)";
+      else label = "Maximum (Visible Noise)";
+      aisStrengthLabel.textContent = label;
+    }
+
+    if (aisStrength) {
+      updateShieldLabel(aisStrength.value);
+      aisStrength.addEventListener("input", (e) => updateShieldLabel(e.target.value));
+    }
+
+    let currentAISFile = null;
+
+    // Setup dropzone using the shared helper
+    setupDropzone(aisDropzone, aisInput, (file) => {
+      console.log("AI Shield file selected:", file.name);
+      currentAISFile = file;
+
+      // Show preview of ORIGINAL image first
+      loadImagePreview(file, aisPreview);
+      aisPreview.style.display = "block";
+      if (aisPlaceholder) aisPlaceholder.style.display = "none";
+
+      // Reset result state
+      aisStatus.className = "status-pill status-idle";
+      aisStatus.textContent = "Ready to protect";
+      aisScore.textContent = "–";
+      aisDownloadBtn.disabled = true;
+    });
+
+    // Apply Shield Button
+    aisBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!currentAISFile) {
+        aisDropzone.classList.add("drag-over");
+        setTimeout(() => aisDropzone.classList.remove("drag-over"), 600);
+        return;
+      }
+
+      const strengthVal = aisStrength.value;
+      console.log("Applying AI Shield with strength:", strengthVal);
+
+      // UI Loading state
+      aisBtn.classList.add("loading");
+      aisBtn.disabled = true;
+      aisStatus.className = "status-pill status-loading";
+      aisStatus.textContent = "Generating adversarial noise...";
+
+      try {
+        const formData = new FormData();
+        formData.append("file", currentAISFile);
+        formData.append("strength", strengthVal); // Backend handles mapping
+
+        const response = await fetch(`${API_BASE}/protect/process`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Protection failed: ${response.statusText}`);
+        }
+
+        // Get headers
+        const robustness = response.headers.get("X-Robustness-Score") || "N/A";
+
+        // Get blob
+        const protectedBlob = await response.blob();
+        const protectedUrl = URL.createObjectURL(protectedBlob);
+
+        // Update UI with result
+        aisPreview.src = protectedUrl;
+        aisScore.textContent = `${robustness}%`;
+
+        aisStatus.className = "status-pill status-success";
+        aisStatus.textContent = "Protection Applied";
+
+        // Enable download
+        aisDownloadBtn.disabled = false;
+        aisDownloadBtn.onclick = () => {
+          const a = document.createElement("a");
+          a.href = protectedUrl;
+          a.download = `protected_${currentAISFile.name}`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        };
+
+        // Show success notification
+        showNotification("Image protected successfully!", "success");
+
+      } catch (err) {
+        console.error("AI Shield Error:", err);
+        aisStatus.className = "status-pill status-error";
+        aisStatus.textContent = "Protection Failed";
+        showNotification(`Error: ${err.message}`, "error");
+      } finally {
+        aisBtn.classList.remove("loading");
+        aisBtn.disabled = false;
+      }
+    });
+
+  } catch (e) {
+    console.error("Error initializing AI Shield:", e);
+  }
+}
+initAIShieldFunctionality();
+
+// =============================
 // Verify section logic
 // =============================
 
@@ -968,7 +1108,8 @@ function initVerifyFunctionality() {
   });
 
   // Verify action - Real backend verification
-  vfBtn.addEventListener("click", async () => {
+  vfBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
     if (!currentVfFile) {
       vfDropzone.classList.add("drag-over");
       setTimeout(() => vfDropzone.classList.remove("drag-over"), 600);
@@ -1162,7 +1303,8 @@ function initStripMetadataFunctionality() {
   }
 
   // Strip metadata action
-  smBtn.addEventListener("click", async () => {
+  smBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
     if (!currentSmFile) {
       smDropzone.classList.add("drag-over");
       setTimeout(() => smDropzone.classList.remove("drag-over"), 600);
@@ -1450,8 +1592,14 @@ function initDetectionFunctionality() {
   }
 
   // Button event listeners
-  detFullBtn.addEventListener('click', () => analyzeImage('full'));
-  detFastBtn.addEventListener('click', () => analyzeImage('fast'));
+  detFullBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    analyzeImage('full');
+  });
+  detFastBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    analyzeImage('fast');
+  });
 
   // Toggle technical details
   detToggleTechnical.addEventListener('click', () => {

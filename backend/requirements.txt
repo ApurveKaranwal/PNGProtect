@@ -12,3 +12,5 @@ email-validator
 PyJWT
 passlib
 bcrypt
+torch
+torchvision

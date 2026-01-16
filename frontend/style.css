@@ -347,9 +347,10 @@ body.light-mode .logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  font-size: 0.9rem;
+  gap: 12px;
+  font-size: 0.85rem;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
@@ -572,7 +573,9 @@ body.light-mode #disconnect-wallet-btn:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 5;
 }
 
 .hero-meta {
@@ -836,6 +839,7 @@ body.light-mode .field input[type="text"]:focus {
 
 .field input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   margin: 10px 0 0;
   background: transparent;

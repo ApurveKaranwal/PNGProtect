@@ -1,211 +1,163 @@
-# PNGProtect 🛡️  
-**Invisible Watermarking & Integrity Protection for PNG Images**
+# PNGProtect
 
-Protect PNG images from unauthorized reuse by embedding invisible, resilient watermarks and verifying image integrity through perceptual hashing. PNGProtect is designed for creators, developers, and researchers who want lightweight yet powerful image ownership protection.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.95%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Status](https://img.shields.io/badge/Status-Active-success)](https://github.com/ApurveKaranwal/PNGProtect)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-[🌐 Live Demo](#) • [📦 GitHub Repository](#) • [📄 Research-Inspired](https://arxiv.org/abs/2003.06158)
+> **Invisible Watermarking. Visible Ownership. Robust AI Protection.**
 
-<br>
+**PNGProtect** is a next-generation image security platform designed to empower creators in the age of generative AI. By combining steganography, cryptography, and adversarial machine learning, PNGProtect offers a multi-layered defense system for digital assets. Whether you are a digital artist, photographer, or platform, PNGProtect helps you assert ownership and protect your work from unauthorized AI training.
 
-## Overview
+---
 
-**PNGProtect** is a security-focused image protection tool that embeds **invisible watermarks** into PNG images and verifies ownership using **perceptual hashing** techniques. The watermark survives common image transformations while remaining visually imperceptible.
+## 🌟 Key Features
 
-Unlike visible watermarks that degrade aesthetics, PNGProtect ensures **silent attribution** and **tamper detection** without affecting image quality.
+### 🛡️ AI Shield (Adversarial Protection)
+**Stop AI Scrapers in their tracks.**
+- **Adversarial Noise Injection**: Injects imperceptible perturbations using Fast Gradient Sign Method (FGSM) that disrupt the feature extraction layers of computer vision models (e.g., ResNet, CLIP).
+- **Unlearnable Data**: Makes images "unlearnable" for AI training pipelines without degrading visual quality for human viewers.
+- **Robustness Scoring**: Real-time analysis providing a scored metric of how resistant your image is to AI interpretation.
 
-<br>
+### 🔐 Invisible Watermarking
+**Ownership that stays with your content.**
+- **LSB Steganography**: Embeds ownership identifiers directly into the pixel data (Least Significant Bits).
+- **Imperceptible**: The watermark is invisible to the naked eye, preserving the artistic integrity of your work.
+- **Machine-Readable**: Watermarks persist through standard file sharing and storage, allowing for automated verification.
 
-## Core Principles
+### 🔍 Forensic Tamper Detection
+**Verify authenticity with confidence.**
+- **Integrity Analysis**: Automatically detects if an image has been modified, cropped, or compressed.
+- **Confidence Scoring**: Provides a detailed confidence score indicating the likelihood of manipulation.
+- **Artifact Detection**: Identifies potential removal attempts or post-processing artifacts.
 
-- **Invisible by Design**  
-  Watermarks are embedded in the frequency domain and are not visible to the human eye.
+### 🧹 Metadata Cleaning
+**Privacy-first distribution.**
+- **Strip Metadata**: Removes sensitive EXIF data, GPS coordinates, device information, and color profiles for clean, private sharing.
 
-- **Resilient Protection**  
-  Designed to survive compression, resizing, minor edits, and format-preserving transformations.
+---
 
-- **Ownership Verification**  
-  Detects whether an image has been modified or reused using perceptual hash comparison.
+## 🏗️ Architecture & Tech Stack
 
-- **Lightweight & Developer-Friendly**  
-  Simple CLI / script-based workflow with minimal dependencies.
+PNGProtect is built as a modern full-stack application, ensuring high performance and scalability.
 
-<br>
+### Backend (Python/FastAPI)
+The core logic resides in a high-performance Python backend.
+- **API Framework**: `FastAPI` for asynchronous, high-speed API endpoints.
+- **ML Engine**: `PyTorch` & `Torchvision` for adversarial attack generation (AI Shield).
+- **Image Processing**: `OpenCV`, `Pillow (PIL)`, `NumPy` for matrix manipulation and steganography.
+- **Security**: Cryptographic hashing and validation logic.
 
-## Features
+### Frontend (Static Web)
+A lightweight, aesthetically pleasing interface using glassmorphism design principles.
+- **Core**: Semantic `HTML5`, Modern `JavaScript (ES6+)`.
+- **Styling**: Vanilla `CSS3` with custom animations and responsive layout.
+- **Web3**: `Ethers.js` integration for optional blockchain wallet connectivity.
 
-### 1. Invisible Watermark Embedding
-- Embeds a unique signature into PNG images
-- Does not affect visual quality
-- Resistant to:
-  - Resizing
-  - Minor cropping
-  - Compression artifacts
-
-### 2. Watermark Extraction & Verification
-- Extracts embedded watermark from protected images
-- Confirms whether an image belongs to the original owner
-- Detects tampering attempts
-
-### 3. Perceptual Hashing (pHash)
-- Generates perceptual hashes for images
-- Identifies visually similar or modified copies
-- Useful for duplicate and infringement detection
-
-### 4. Integrity Validation
-- Compares original and modified images
-- Flags unauthorized edits or distribution
-- Supports forensic-style analysis workflows
-
-<br>
-
-## Usage Guide
-
-### Step 1 — Embed Watermark
-```bash
-python embed.py --input image.png --output protected.png --key "your_secret_key"
+### Directory Structure
+```
+PNGProtect/
+├── backend/                  # 🧠 Server-side Logic
+│   ├── app/
+│   │   ├── main.py           # Application Entry Point & Config
+│   │   ├── routes/           # API Routers (Protection, Watermark, Verify)
+│   │   └── services/         # Core Business Logic (Adversarial, Stego)
+│   ├── requirements.txt      # Python Dependencies
+│   └── venv/                 # Virtual Environment
+├── frontend/                 # 🎨 Client-side Interface
+│   ├── index.html            # Main UI
+│   ├── script.js             # Interactivity & API Communication
+│   └── style.css             # Glassmorphism Design System
+└── README.md                 # 📖 Documentation
 ```
 
-### Step 2 - Verify Image
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up the project locally for development and testing.
+
+### Prerequisites
+- **Python**: Version 3.10 or higher.
+- **Node.js**: (Optional) For serving the frontend via simple server.
+- **Git**: For version control.
+
+### Installation
+
+#### 1. Clone the Repository
 ```bash
-python verify.py --input protected.png --key "your_secret_key"
+git clone https://github.com/ApurveKaranwal/PNGProtect.git
+cd PNGProtect
 ```
 
-### Step 3 - Similarity Check
+#### 2. Backend Setup
+Set up the Python environment and install dependencies (including PyTorch).
 ```bash
-python phash_compare.py image1.png image2.png
+cd backend
+python -m venv venv
+# Activate Virtual Environment:
+source venv/bin/activate      # Linux/macOS
+# .\venv\Scripts\activate     # Windows PowerShell
+
+# Install Dependencies
+pip install -r requirements.txt
 ```
+> **Note:** PyTorch installation size is approx ~2GB if CUDA is enabled.
 
-## 🔧 API Endpoints
-
-- **Authentication**: `/auth/login`, `/auth/register`, `/auth/me`
-- **Watermarking**: `/watermark/embed`, `/watermark/{id}`
-- **Verification**: `/verify/detect`, `/verify/extract`
-- **Dashboard**: `/dashboard/stats`, `/dashboard/analytics`
-- **Metadata**: `/metadata/strip`
-- **Blockchain Registry**: `/registry/abi` (smart contract integration)
-
-## � Blockchain Features
-
-### Wallet Integration
-- **MetaMask Connection** - Seamless wallet linking
-- **Account Management** - Automatic account switching detection
-- **Network Support** - Ethereum mainnet and testnets
-
-### On-Chain Registration
-- **Ownership Registry** - Register watermark ownership on blockchain
-- **Smart Contract** - Ethereum-based ownership verification
-- **Immutable Records** - Permanent ownership proof
-
-### Usage Flow
-1. **Watermark** your image using the invisible watermarking system
-2. **Verify** the watermark is properly embedded
-3. **Connect Wallet** using MetaMask
-4. **Register Ownership** on-chain for permanent proof
-
-## 🎨 Tech Stack
-
-- **Backend**: FastAPI, SQLite, Python
-- **Frontend**: Vanilla JavaScript, CSS Grid, HTML5
-- **Authentication**: JWT-like tokens, password hashing
-- **Blockchain**: ethers.js, MetaMask integration, Solidity smart contracts
-- **Styling**: Glassmorphism design, responsive layout
-
-## 🔒 Security Features
-
-- **Password Hashing** with SHA-256
-- **Session Management** with secure tokens
-- **CORS Protection** properly configured
-- **Input Validation** on all endpoints
-- **Blockchain Security** - Immutable ownership records
-
-## 📝 License
-
-## Architecture
-        ┌──────────── Input PNG ─────────────┐
-                        │
-               ┌────────▼────────┐
-               │ Watermark Engine│  ◄─ Frequency-domain embedding
-               └────────┬────────┘
-                        │
-               ┌────────▼────────┐
-               │ PNG Encoder     │
-               └────────┬────────┘
-                        │
-               ┌────────▼────────┐
-               │ pHash Generator │ ◄─ Visual similarity detection
-               └────────┬────────┘
-                        │
-               ┌────────▼────────┐
-               │ Verification    │ ◄─ Ownership & tamper check
-               └─────────────────┘
-
-## Tech Stack
-| Layer        | Tools / Libraries           |
-| ------------ | --------------------------- |
-| Language     | Python                      |
-| Image Ops    | Pillow, OpenCV              |
-| Watermarking | Frequency-domain algorithms |
-| Hashing      | pHash (Perceptual Hashing)  |
-| Utilities    | NumPy, argparse             |
-
-## Security Considerations
-- Invisible Watermarks
-Embedded at a signal-processing level, not pixel overlays.
-
-- Tamper Detection
-Any destructive modification alters the watermark or perceptual hash.
-
-- False Positive Resistance
-Threshold-based pHash comparison avoids accidental matches.
-
-- Offline & Private
-No external servers, APIs, or cloud dependencies.
-
-## Folder Structure
+#### 3. Start the Backend Server
+Run the FastAPI server with hot-reload enabled.
 ```bash
-.
-├── embed.py              # Watermark embedding logic
-├── verify.py             # Watermark extraction & verification
-├── phash_compare.py      # Perceptual hash comparison
-├── utils/                # Helper functions
-├── samples/              # Test images
-└── README.md
+python -m uvicorn app.main:app --reload
 ```
+The API will be available at `http://127.0.0.1:8000`. You can view the automatic API docs at `http://127.0.0.1:8000/docs`.
 
-## Use Cases
-- 🎨 Digital artists protecting original artwork
+#### 4. Launch the Frontend
+In a new terminal, navigate to the frontend directory and serve the static files.
+```bash
+cd ../frontend
+# Using Python's built-in server
+python -m http.server 3000
+```
+Open your browser and navigate to `http://localhost:3000`.
 
-- 📸 Photographers tracking image reuse
+---
 
-- 🧑‍💻 Developers building DRM or content verification tools
+## � Usage Guide
 
-- 🧪 Academic research on image watermarking
+### Using AI Shield
+1.  Navigate to the **AI Shield** section in the web app.
+2.  **Upload**: Drag & drop your artwork or photo.
+3.  **Configure**: Adjust the "Protection Level" slider.
+    *   **Standard (50%)**: Recommended balance between invisibility and protection.
+    *   **High (80%+)**: Stronger perturbations, may introduce slight grain.
+4.  **Apply**: Click "Apply AI Shield". The backend will process the image (first run may take a few seconds to load models).
+5.  **Download**: Save your protected image.
 
-- 🛡️ Copyright and IP protection workflows
+### Verifying Ownership
+1.  Go to the **Verify** tab.
+2.  Upload an image you suspect contains a watermark.
+3.  The system will decode the LSB data and recover the **Owner ID** if present.
 
- ## Limitations
- - Extremely aggressive cropping may reduce watermark recoverability
- - Not designed to resist full re-drawing or AI regeneration
- - PNG-focused (JPEG support may be added later)
+---
 
- ## Roadmap
-  - JPEG support
+## 🤝 Contributing
 
-  - Batch processing
+We welcome contributions from the community! Whether it's fixing bugs, improving documentation, or proposing new features.
 
-  - GUI interface
+1.  Fork the repository.
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the branch (`git push origin feature/AmazingFeature`).
+5.  Open a Pull Request.
 
-  - Stronger multi-key watermarking
+## 📄 License
 
-  - Web-based verification demo
+Distributed under the MIT License. See `LICENSE` for more information.
 
- ## Refrences
-   - Invisible Watermarking Survey
-   - pHash–Perceptual Hashing
-   - [Digital Image Watermarking – Cox et al.]
+---
 
- ## License
- MIT License © 2026
- 
- Built with ❤️ for creators and open-source contributors.
- 
+<p align="center">
+  Built with ❤️ by <strong>Apurve Karanwal</strong>
+</p>
