@@ -68,11 +68,36 @@ test_*.py
 *_test.py
 test_*.html
 *_test.html
+*test*.html
+*test*.py
+comprehensive_test.py
+simple_test.py
+final_backend_test.py
+minimal_test.html
+frontend_test.html
+watermark_test.html
+debug_*.html
+debug_*.js
 
-# Documentation (temporary)
+# Documentation (temporary/development)
 *_FIXES.md
 *_INSTRUCTIONS.md
 *_SUMMARY.md
+*_GUIDE.md
+*_README.md
+*_QUICKSTART.md
+*_COMPLETE.md
+*_OVERVIEW.md
+*_ARCHITECTURE.md
+*_CHECKLIST.md
+STATUS.txt
+SYSTEM_STATUS.md
+INDEX.md
+QUICK_*.md
+START_*.md
+STARTUP_*.md
+INTEGRATION_*.md
+VISUAL_*.md
 
 # Node modules (if using npm)
 node_modules/
@@ -83,5 +108,7 @@ yarn.lock
 *.min.js
 *.min.css
 
+# Keep only main README
 *.md
 !README.md
+!LICENSE
