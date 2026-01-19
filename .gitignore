@@ -108,7 +108,11 @@ yarn.lock
 *.min.js
 *.min.css
 
-# Keep only main README
-*.md
-!README.md
-!LICENSE
+# Startup scripts
+START_*.py
+
+# Test images
+test_*.png
+*_test.png
+watermarked_*.png
+*watermark*.png
