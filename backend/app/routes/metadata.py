@@ -35,8 +35,8 @@ async def strip_metadata(file: UploadFile = File(...)):
         # Strip all metadata
         clean_image = strip_metadata_from_image(image)
         
-        # Save as clean PNG
-        clean_bytes = save_image_to_bytes(clean_image, "png")
+        # Save as clean PNG (optimized to reduce size)
+        clean_bytes = save_image_to_bytes(clean_image, "png", optimize=True)
         
         # Return the cleaned image as a file download
         return StreamingResponse(

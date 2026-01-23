@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Invisible Watermarks. Visible Ownership.</title>
+  <title>Invisible Watermarks. Visible Ownership. | PNGProtect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -17,22 +17,20 @@
   <header class="top-nav">
     <div class="logo">
       <span class="logo-dot"></span>
-      <span>PNGProtect</span>
+      <a href="index.html" style="text-decoration: none; color: inherit;"><span>PNGProtect</span></a>
     </div>
     <nav class="nav-links">
-      <a href="#hero">Home</a>
-      <a href="#watermark">Watermark</a>
-      <a href="#ai-shield">AI Shield</a>
-      <a href="#verify">Verify</a>
-      <a href="#detect">Detect Tampering</a>
-      <a href="#strip">Clean</a>
+      <a href="index.html" class="active">Home</a>
+      <a href="watermark.html">Watermark</a>
+      <a href="ai-shield.html">AI Shield</a>
+      <a href="verify.html">Verify</a>
+      <a href="detect.html">Detect Tampering</a>
+      <a href="cleanup.html">Clean</a>
     </nav>
     <div class="user-area">
-      <!-- Wallet connection (blockchain feature) -->
       <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
       <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
       <span id="wallet-address" class="wallet-address">Not connected</span>
-      <!-- Light mode toggle -->
       <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
         title="Toggle light/dark mode">🌙</button>
     </div>
@@ -44,18 +42,19 @@
       <div class="hero-content glass">
         <h1 class="hero-title">Invisible Watermarks. Visible Ownership.</h1>
         <p class="hero-subtitle">
-          Embed hidden ownership data into your images without changing how they look to the human eye.
+          Embed hidden ownership data into your images without changing how they look to the human eye. Protect against
+          AI scraping and theft.
         <div class="hero-actions">
-          <button class="btn primary" data-scroll="#watermark">
+          <a href="watermark.html" class="btn primary">
             Watermark Image
-          </button>
-          <button class="btn secondary" data-scroll="#ai-shield"
-            style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4);">
+          </a>
+          <a href="ai-shield.html" class="btn secondary"
+            style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); text-decoration: none;">
             AI Shield
-          </button>
-          <button class="btn ghost" data-scroll="#verify">
+          </a>
+          <a href="verify.html" class="btn ghost" style="text-decoration: none;">
             Verify Ownership
-          </button>
+          </a>
         </div>
         <div class="hero-meta">
           <span class="pill">Client-side demo only</span>
@@ -64,432 +63,7 @@
       </div>
     </section>
 
-    <!-- WATERMARK IMAGE SECTION -->
-    <section id="watermark" class="section">
-      <div class="section-header">
-        <h2>Watermark Image</h2>
-        <p>Simulate embedding an invisible owner ID into your image.</p>
-      </div>
-
-      <div class="layout-grid">
-        <!-- Upload + controls -->
-        <div class="glass card">
-          <h3>Upload & Configure</h3>
-
-          <!-- Drag & drop area -->
-          <input type="file" id="wm-input" accept="image/*" hidden />
-          <div id="wm-dropzone" class="dropzone">
-            <div class="dropzone-inner">
-              <span class="drop-icon">⬆️</span>
-              <p>Drag & drop an image here</p>
-              <p class="drop-subtext">or click to browse</p>
-            </div>
-          </div>
-
-          <!-- Owner ID text input -->
-          <label class="field">
-            <span class="field-label">Owner ID / Handle</span>
-            <input type="text" id="wm-owner-id" maxlength="64" placeholder="@creator, email, or UUID" />
-          </label>
-
-          <!-- Strength slider -->
-          <label class="field">
-            <div class="field-row">
-              <span class="field-label">Watermark strength</span>
-              <span id="wm-strength-label" class="field-label-soft">Medium</span>
-            </div>
-            <input type="range" id="wm-strength" min="1" max="100" value="60" />
-            <div class="field-scale">
-              <span>Low</span>
-              <span>High</span>
-            </div>
-          </label>
-
-          <!-- Apply button + fake loading -->
-          <button id="wm-apply-btn" class="btn primary full">
-            <span class="btn-label">Apply Invisible Watermark</span>
-            <span class="btn-spinner"></span>
-          </button>
-
-          <p class="hint">
-            This is a front-end simulation.
-          </p>
-        </div>
-
-        <!-- Preview card -->
-        <div class="glass card">
-          <h3>Preview</h3>
-          <div class="preview-toggle-row">
-            <button class="chip chip-active" data-preview-mode="original">
-              Original
-            </button>
-            <button class="chip" data-preview-mode="watermarked">
-              Watermarked
-            </button>
-          </div>
-
-          <div class="preview-wrapper">
-            <div class="preview-placeholder" id="wm-preview-placeholder">
-              <span class="preview-icon">🖼️</span>
-              <p>Upload an image to preview</p>
-            </div>
-
-            <img id="wm-preview-original" class="preview-image" alt="Original preview" />
-            <img id="wm-preview-watermarked" class="preview-image" alt="Watermarked preview" />
-          </div>
-
-          <p class="preview-note">
-            Visuals remain unchanged; watermark lives in invisible data channels in real systems.
-          </p>
-
-          <button id="wm-download-btn" class="btn ghost full" disabled>
-            Download Watermarked Image
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- AI SHIELD SECTION -->
-    <section id="ai-shield" class="section">
-      <div class="section-header">
-        <h2>AI Shield</h2>
-        <p>Protect your images from AI scraping and unauthorized model training.</p>
-      </div>
-
-      <div class="layout-grid">
-        <!-- Upload + controls -->
-        <div class="glass card">
-          <h3>Upload & Protect</h3>
-
-          <div id="ais-dropzone" class="dropzone">
-            <input type="file" id="ais-input" accept="image/*" hidden />
-            <div class="dropzone-inner">
-              <span class="drop-icon">🛡️</span>
-              <p>Drag & drop image to protect</p>
-              <p class="drop-subtext">or click to browse</p>
-            </div>
-          </div>
-
-          <!-- Protection Level Slider -->
-          <label class="field">
-            <div class="field-row">
-              <span class="field-label">Protection Level</span>
-              <span id="ais-strength-label" class="field-label-soft">Standard</span>
-            </div>
-            <input type="range" id="ais-strength" min="1" max="100" value="50" />
-            <div class="field-scale">
-              <span>Low</span>
-              <span>High (Visible Noise)</span>
-            </div>
-          </label>
-
-          <button id="ais-btn" class="btn primary full">
-            <span class="btn-label">Apply AI Shield</span>
-            <span class="btn-spinner"></span>
-          </button>
-
-          <p class="hint">
-            Adds invisible adversarial noise that disrupts AI feature extraction.
-          </p>
-        </div>
-
-        <!-- Result card -->
-        <div class="glass card result-card">
-          <h3>Protection Result</h3>
-
-          <div id="ais-status" class="status-pill status-idle">
-            Waiting for image...
-          </div>
-
-          <div class="preview-wrapper"
-            style="margin: 1rem 0; min-height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 8px;">
-            <img id="ais-preview" class="preview-image" style="display: none; max-width: 100%; max-height: 300px;" />
-            <div id="ais-placeholder" style="color: var(--text-soft); font-size: 0.9rem;">
-              Preview will appear here
-            </div>
-          </div>
-
-          <div class="result-grid">
-            <div class="result-item">
-              <span class="result-label">Robustness Score</span>
-              <span id="ais-score" class="result-value">–</span>
-            </div>
-          </div>
-
-          <button id="ais-download-btn" class="btn ghost full" disabled>
-            Download Protected Image
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- VERIFY IMAGE SECTION -->
-    <section id="verify" class="section">
-      <div class="section-header">
-        <h2>Verify Image</h2>
-        <p>Check if an invisible watermark and owner ID can be recovered.</p>
-      </div>
-
-      <div class="layout-grid">
-        <!-- Upload -->
-        <div class="glass card">
-          <h3>Upload Image to Verify</h3>
-
-          <div id="vf-dropzone" class="dropzone">
-            <input type="file" id="vf-input" accept="image/*" hidden />
-            <div class="dropzone-inner">
-              <span class="drop-icon">🔍</span>
-              <p>Drop an image to verify</p>
-              <p class="drop-subtext">or click to browse</p>
-            </div>
-          </div>
-          <img id="vf-preview" class="preview-image"
-            style="margin: 1rem auto; display: none; max-height: 200px; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"
-            alt="Verify Preview" />
-
-          <button id="vf-btn" class="btn primary full">
-            <span class="btn-label">Verify Watermark</span>
-            <span class="btn-spinner"></span>
-          </button>
-
-          <p class="hint">
-            In production, verification would decode embedded watermark data and validate it cryptographically.
-          </p>
-        </div>
-
-        <!-- Result card -->
-        <div class="glass card result-card">
-          <h3>Verification Result</h3>
-
-          <div id="vf-status" class="status-pill status-idle">
-            Waiting for an image…
-          </div>
-
-          <div class="result-grid">
-            <div class="result-item">
-              <span class="result-label">Watermark detected</span>
-              <span id="vf-detected" class="result-value">–</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Owner ID</span>
-              <span id="vf-owner" class="result-value">–</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Confidence</span>
-              <span id="vf-confidence" class="result-value">–</span>
-            </div>
-          </div>
-
-          <!-- Animated bars for success -->
-          <div class="confidence-bars" id="vf-bars">
-            <span></span><span></span><span></span><span></span><span></span>
-          </div>
-
-          <div style="margin-top:1rem; display:flex; gap:8px; align-items:center;">
-            <button id="register-onchain-btn" class="btn primary" disabled>Register Ownership On-Chain</button>
-            <div id="register-status" style="font-size:0.9rem;color:#94a3b8;">Not registered</div>
-          </div>
-
-          <p class="hint">
-            Confidence is randomly generated in this demo and does not reflect real model certainty.
-          </p>
-        </div>
-      </div>
-    </section>
-    <!-- DETECT TAMPERING SECTION -->
-    <section id="detect" class="section">
-      <div class="section-header">
-        <h2>Detect Watermark Tampering</h2>
-        <p>Analyze if an image has been tampered with or if the watermark has been removed.</p>
-      </div>
-
-      <div class="layout-grid">
-        <!-- Upload & Analysis Controls -->
-        <div class="glass card">
-          <h3>Upload Image to Analyze</h3>
-
-          <div id="det-dropzone" class="dropzone">
-            <input type="file" id="det-input" accept="image/*" hidden />
-            <div class="dropzone-inner">
-              <span class="drop-icon">🔬</span>
-              <p>Drop an image for forensic analysis</p>
-              <p class="drop-subtext">or click to browse</p>
-            </div>
-          </div>
-          <img id="det-preview" class="preview-image"
-            style="margin: 1rem auto; display: none; max-height: 200px; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"
-            alt="Detection Preview" />
-
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0;">
-            <button id="det-full-btn" class="btn primary" style="flex: 1; min-width: 120px;">
-              <span class="btn-label">Full Analysis</span>
-              <span class="btn-spinner"></span>
-            </button>
-            <button id="det-fast-btn" class="btn ghost" style="flex: 1; min-width: 120px;">
-              <span class="btn-label">Fast Forensics</span>
-              <span class="btn-spinner"></span>
-            </button>
-          </div>
-
-          <p class="hint">
-            Full Analysis: Combines forensic methods with ML detection (200-500ms).<br>
-            Fast Forensics: Rule-based detection only, instant results (100-300ms).
-          </p>
-        </div>
-
-        <!-- Results Display -->
-        <div class="glass card result-card">
-          <h3>Tampering Analysis Results</h3>
-
-          <div id="det-status" class="status-pill status-idle">
-            Waiting for an image…
-          </div>
-
-          <!-- Confidence Score Display -->
-          <div id="det-confidence-container" style="display: none; margin: 1.5rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <span style="font-weight: 600;">Tampering Confidence</span>
-              <span id="det-confidence-value" class="confidence-badge">0%</span>
-            </div>
-            <div class="confidence-bar">
-              <div id="det-confidence-fill" class="confidence-fill" style="width: 0%;"></div>
-            </div>
-            <p id="det-confidence-level"
-              style="font-size: 0.9rem; color: var(--text-soft); margin-top: 0.5rem; margin-bottom: 0;">
-              Likelihood: Unknown
-            </p>
-          </div>
-
-          <!-- Likelihood Badge -->
-          <div id="det-verdict-container"
-            style="display: none; margin: 1.5rem 0; padding: 1rem; background: rgba(148, 163, 184, 0.1); border-radius: 12px; border-left: 4px solid var(--accent-blue);">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span id="det-verdict-icon" style="font-size: 1.5rem;">❓</span>
-              <div>
-                <div style="font-weight: 600;" id="det-verdict-title">Analysis Status</div>
-                <div style="font-size: 0.9rem; color: var(--text-soft);" id="det-verdict-text">Analyzing image...</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Detected Techniques -->
-          <div id="det-techniques-container" style="display: none; margin: 1.5rem 0;">
-            <h4
-              style="margin: 0 0 0.75rem 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-soft);">
-              Detected Artifacts</h4>
-            <div id="det-techniques-list" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
-          </div>
-
-          <!-- Forensic Explanation -->
-          <div id="det-explanation-container"
-            style="display: none; margin: 1.5rem 0; padding: 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 12px;">
-            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem; color: var(--accent-purple);">Forensic Analysis</h4>
-            <p id="det-explanation-text"
-              style="margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--text-soft);"></p>
-          </div>
-
-          <!-- Technical Summary -->
-          <div id="det-technical-container"
-            style="display: none; margin: 1.5rem 0; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 12px;">
-            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem; color: var(--accent-blue);">Technical Details</h4>
-            <pre id="det-technical-text"
-              style="margin: 0; font-size: 0.8rem; color: var(--text-soft); overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; line-height: 1.4;"></pre>
-          </div>
-
-          <!-- Toggle Technical Details Button -->
-          <button id="det-toggle-technical" class="btn ghost full" style="display: none; margin-top: 1rem;">
-            Show Technical Details
-          </button>
-        </div>
-      </div>
-
-      <div class="workflow-info">
-        <h3>How Tampering Detection Works</h3>
-        <p>
-          Our detection system uses a <strong>hybrid approach</strong> combining forensic analysis and machine learning:
-        </p>
-        <ul style="color: var(--text-soft); line-height: 1.8;">
-          <li><strong>Blur Detection:</strong> Analyzes Laplacian variance to detect image smoothing or blur effects.
-          </li>
-          <li><strong>Noise Inconsistency:</strong> Detects unnatural noise patterns that indicate post-processing.</li>
-          <li><strong>Compression Artifacts:</strong> Identifies JPEG blocking and compression anomalies.</li>
-          <li><strong>Edge Anomalies:</strong> Finds unusual edge density that suggests watermark removal.</li>
-          <li><strong>Frequency Analysis:</strong> Uses FFT to detect frequency domain artifacts.</li>
-          <li><strong>ML Classification:</strong> Trained model uses 40+ statistical features for advanced detection.
-          </li>
-        </ul>
-        <p style="margin-bottom: 0;">
-          The system provides a <strong>confidence score (0-100%)</strong> indicating the likelihood of watermark
-          tampering, along with specific artifacts detected and human-readable explanations.
-        </p>
-      </div>
-    </section>
-    <!-- STRIP METADATA SECTION -->
-    <section id="strip" class="section">
-      <div class="section-header">
-        <h2>Remove Metadata</h2>
-        <p>Strip all metadata and encoding from your images for privacy and clean distribution.</p>
-      </div>
-
-      <div class="layout-grid">
-        <!-- Upload -->
-        <div class="glass card">
-          <h3>Upload Image to Clean</h3>
-
-          <div id="sm-dropzone" class="dropzone">
-            <input type="file" id="sm-input" accept="image/*" hidden />
-            <div class="dropzone-inner">
-              <span class="drop-icon">🧹</span>
-              <p>Drop an image to clean</p>
-              <p class="drop-subtext">or click to browse</p>
-            </div>
-          </div>
-
-          <button id="sm-btn" class="btn primary full">
-            <span class="btn-label">Remove Metadata</span>
-            <span class="btn-spinner"></span>
-          </button>
-
-          <p class="hint">
-            Removes all EXIF data, color profiles, and encoding metadata while preserving image quality.
-          </p>
-        </div>
-
-        <!-- Result card -->
-        <div class="glass card result-card">
-          <h3>Cleaning Result</h3>
-
-          <div id="sm-status" class="status-pill status-idle">
-            Waiting for an image…
-          </div>
-
-          <div class="result-grid">
-            <div class="result-item">
-              <span class="result-label">Original Size</span>
-              <span id="sm-original-size" class="result-value">–</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Cleaned Size</span>
-              <span id="sm-cleaned-size" class="result-value">–</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Reduced by</span>
-              <span id="sm-reduction" class="result-value">–</span>
-            </div>
-          </div>
-
-          <button id="sm-download-btn" class="btn ghost full" disabled>
-            Download Cleaned Image
-          </button>
-
-          <p class="hint">
-            The cleaned image will be saved as PNG format for optimal quality.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- FEATURES SECTION -->
+    <!-- FEATURES OVERVIEW GRID -->
     <section id="features" class="section">
       <div class="section-header">
         <h2>Platform Features</h2>
@@ -497,86 +71,58 @@
       </div>
 
       <div class="features-grid">
-        <article class="glass feature-card">
+        <a href="watermark.html" class="glass feature-card"
+          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
           <div class="feature-icon">☑️</div>
           <h3>Invisible Watermarking</h3>
           <p>
-            Embed hidden ownership identifiers into images using LSB steganography. The watermark is imperceptible to
-            the human eye while remaining machine-readable and extractable for verification purposes.
+            Embed hidden ownership identifiers into images using LSB steganography.
           </p>
-        </article>
+        </a>
 
-        <article class="glass feature-card">
-          <div class="feature-icon">🪪</div>
-          <h3>Ownership Proof & Attribution</h3>
-          <p>
-            Cryptographically link content to creators through encoded owner IDs, email addresses, or unique
-            identifiers. Establish verifiable provenance and attribution chains for digital assets.
-          </p>
-        </article>
-
-        <article class="glass feature-card">
+        <a href="ai-shield.html" class="glass feature-card"
+          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
           <div class="feature-icon">🛡️</div>
-          <h3>Tamper Detection & Integrity</h3>
+          <h3>AI Shield Protection</h3>
           <p>
-            Automatically detect suspicious modifications when watermark patterns deviate from original values. Receive
-            detailed confidence scores and tamper status reports for each verification.
+            Add invisible noise to disrupt AI scrapers and unauthorized model training.
           </p>
-        </article>
+        </a>
 
-        <article class="glass feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Configurable Strength Levels</h3>
-          <p>
-            Fine-tune watermark robustness from 1-10. Higher strength = greater resilience to compression and edits,
-            lower strength = minimal visual impact. Adapt to your specific use case requirements.
-          </p>
-        </article>
-
-        <article class="glass feature-card">
+        <a href="verify.html" class="glass feature-card"
+          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
           <div class="feature-icon">🔍</div>
-          <h3>Real-Time Verification</h3>
+          <h3>Verify Ownership</h3>
           <p>
-            Instantly verify watermarks and recover owner IDs from any image file. Get immediate feedback on watermark
-            presence, extraction confidence, and asset integrity status in real-time.
+            Instantly verify watermarks and recover owner IDs from any image file.
           </p>
-        </article>
+        </a>
 
-        <article class="glass feature-card">
-          <div class="feature-icon">📦</div>
-          <h3>Batch Processing Ready</h3>
+        <a href="detect.html" class="glass feature-card"
+          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
+          <div class="feature-icon">🔬</div>
+          <h3>Tamper Detection</h3>
           <p>
-            Integrate with production pipelines and asset management systems. Process thousands of images automatically,
-            assigning unique identifiers while maintaining consistent quality and performance.
+            Analyze if an image has been manipulated or if a watermark has been removed.
           </p>
-        </article>
+        </a>
 
-        <article class="glass feature-card">
-          <div class="feature-icon">🌐</div>
-          <h3>Public Verification API</h3>
-          <p>
-            Allow anyone to verify content authenticity without private keys. Share public verification endpoints for
-            transparency while maintaining creator privacy and control over sensitive metadata.
-          </p>
-        </article>
-
-        <article class="glass feature-card">
+        <a href="cleanup.html" class="glass feature-card"
+          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
           <div class="feature-icon">🧹</div>
           <h3>Metadata Stripping</h3>
           <p>
-            Remove EXIF data, color profiles, and all encoding metadata from images for privacy and clean distribution.
-            Keep only essential pixel data while preserving image quality.
+            Remove EXIF, GPS, and device data for privacy before sharing.
           </p>
-        </article>
+        </a>
 
-        <article class="glass feature-card">
-          <div class="feature-icon">📊</div>
-          <h3>Detailed Analytics</h3>
+        <div class="glass feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Blockchain Registry</h3>
           <p>
-            Comprehensive reporting including match ratios, confidence scores, extraction data, and modification
-            detection. Track watermark resilience across different compression formats and edits.
+            (Coming Soon) Register ownership claims on Ethereum for immutable proof.
           </p>
-        </article>
+        </div>
       </div>
     </section>
 
@@ -584,76 +130,24 @@
     <section id="how-it-works" class="section">
       <div class="section-header">
         <h2>How it Works</h2>
-        <p>A sophisticated yet simple flow designed for creators, platforms, content managers, and verification tools.
-        </p>
+        <p>A sophisticated yet simple flow designed for creators, platforms, and teams.</p>
       </div>
-
       <div class="steps-grid">
         <div class="glass step-card">
           <div class="step-number">01</div>
           <h3>Select & Configure</h3>
-          <p>
-            Upload your image and provide an owner ID, email, or unique identifier to embed. Choose watermark strength
-            (1-10) based on your resilience requirements and quality constraints.
-          </p>
+          <p>Upload your image and choose your protection method (Watermark or AI Shield).</p>
         </div>
-
         <div class="glass step-card">
           <div class="step-number">02</div>
-          <h3>Embed Watermark</h3>
-          <p>
-            Our LSB steganography algorithm embeds your identification data into the least significant bits of pixel
-            values. The modification is imperceptible but robust enough to survive compression and minor edits.
-          </p>
+          <h3>Embed & Protect</h3>
+          <p>Algorithms embed invisible data or adversarial noise into the pixel values.</p>
         </div>
-
         <div class="glass step-card">
           <div class="step-number">03</div>
-          <h3>Download & Distribute</h3>
-          <p>
-            Receive your watermarked image as a PNG file. The watermark persists through storage, sharing, and
-            distribution. Share freely knowing your ownership is encoded within.
-          </p>
+          <h3>Verify Anywhere</h3>
+          <p>Anyone can use the public verification tools to check ownership and integrity.</p>
         </div>
-
-        <div class="glass step-card">
-          <div class="step-number">04</div>
-          <h3>Verify Ownership</h3>
-          <p>
-            Upload any image to the verification section. The system extracts and analyzes embedded watermarks,
-            returning the recovered owner ID and confidence scores instantly.
-          </p>
-        </div>
-
-        <div class="glass step-card">
-          <div class="step-number">05</div>
-          <h3>Detect Modifications</h3>
-          <p>
-            Receive detailed analysis of watermark integrity. See if the image is intact, slightly modified, or heavily
-            tampered with based on pattern matching and deviation analysis.
-          </p>
-        </div>
-
-        <div class="glass step-card">
-          <div class="step-number">06</div>
-          <h3>Manage at Scale</h3>
-          <p>
-            Integrate our API into your workflow. Process thousands of images, track ownership chains, and maintain
-            provenance records across your entire content library automatically.
-          </p>
-        </div>
-      </div>
-
-      <div class="workflow-info"
-        style="margin-top: 3rem; padding: 2rem; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.2); border-radius: 12px;">
-        <h3 style="margin-top: 0; color: #60a5fa;">Why LSB Steganography?</h3>
-        <p style="margin-bottom: 0;">
-          Our platform uses Least Significant Bit (LSB) steganography because it offers the perfect balance between
-          invisibility and robustness. By modifying only the least significant bits of pixel data, we achieve watermarks
-          that are completely imperceptible to the human eye while remaining extractable by algorithms. This technique
-          has proven effective across professional applications in digital forensics, content authentication, and
-          copyright protection.
-        </p>
       </div>
     </section>
   </main>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Invisible Watermark | PNGProtect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Animated gradient + particles background -->
+  <div class="bg-gradient"></div>
+  <canvas id="bg-particles"></canvas>
+
+  <!-- Top navigation -->
+  <header class="top-nav">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      <a href="index.html" style="text-decoration: none; color: inherit;"><span>PNGProtect</span></a>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="watermark.html" class="active">Watermark</a>
+      <a href="ai-shield.html">AI Shield</a>
+      <a href="verify.html">Verify</a>
+      <a href="detect.html">Detect Tampering</a>
+      <a href="cleanup.html">Clean</a>
+    </nav>
+    <div class="user-area">
+      <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
+      <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
+      <span id="wallet-address" class="wallet-address">Not connected</span>
+      <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle" title="Toggle light/dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- WATERMARK IMAGE SECTION -->
+    <section id="watermark" class="section" style="padding-top: 80px;">
+      <div class="section-header">
+        <h2>Watermark Image</h2>
+        <p>Simulate embedding an invisible owner ID into your image.</p>
+      </div>
+
+      <div class="layout-grid">
+        <!-- Upload + controls -->
+        <div class="glass card">
+          <h3>Upload & Configure</h3>
+
+          <!-- Drag & drop area -->
+          <input type="file" id="wm-input" accept="image/*" hidden />
+          <div id="wm-dropzone" class="dropzone">
+            <div class="dropzone-inner">
+              <span class="drop-icon">⬆️</span>
+              <p>Drag & drop an image here</p>
+              <p class="drop-subtext">or click to browse</p>
+            </div>
+          </div>
+
+          <!-- Owner ID text input -->
+          <label class="field">
+            <span class="field-label">Owner ID / Handle</span>
+            <input type="text" id="wm-owner-id" maxlength="64" placeholder="@creator, email, or UUID" />
+          </label>
+
+          <!-- Strength slider -->
+          <label class="field">
+            <div class="field-row">
+              <span class="field-label">Watermark strength</span>
+              <span id="wm-strength-label" class="field-label-soft">Medium</span>
+            </div>
+            <input type="range" id="wm-strength" min="1" max="100" value="60" />
+            <div class="field-scale">
+              <span>Low</span>
+              <span>High</span>
+            </div>
+          </label>
+
+          <!-- Apply button + fake loading -->
+          <button id="wm-apply-btn" class="btn primary full">
+            <span class="btn-label">Apply Invisible Watermark</span>
+            <span class="btn-spinner"></span>
+          </button>
+
+          <p class="hint">
+            This is a front-end simulation.
+          </p>
+        </div>
+
+        <!-- Preview card -->
+        <div class="glass card">
+          <h3>Preview</h3>
+          <div class="preview-toggle-row">
+            <button class="chip chip-active" data-preview-mode="original">
+              Original
+            </button>
+            <button class="chip" data-preview-mode="watermarked">
+              Watermarked
+            </button>
+          </div>
+
+          <div class="preview-wrapper">
+            <div class="preview-placeholder" id="wm-preview-placeholder">
+              <span class="preview-icon">🖼️</span>
+              <p>Upload an image to preview</p>
+            </div>
+
+            <img id="wm-preview-original" class="preview-image" alt="Original preview" />
+            <img id="wm-preview-watermarked" class="preview-image" alt="Watermarked preview" />
+          </div>
+
+          <p class="preview-note">
+            Visuals remain unchanged; watermark lives in invisible data channels in real systems.
+          </p>
+
+          <button id="wm-download-btn" class="btn ghost full" disabled>
+            Download Watermarked Image
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETAILED INFO SECTION -->
+    <section class="section">
+      <div class="glass card" style="max-width: 1000px; margin: 0 auto;">
+        <h3>About Invisible Watermarking</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+          <div>
+            <h4 style="color: var(--primary-color);">What is it?</h4>
+            <p>Invisible watermarking is the process of embedding information into digital content (like images) in a way that is not visible to the human eye but can be detected by computer algorithms.</p>
+            
+            <h4 style="color: var(--primary-color); margin-top: 1.5rem;">How it works (LSB Steganography)</h4>
+            <p>Our method utilizes <strong>Least Significant Bit (LSB) Steganography</strong>. Digital images are made of pixels, and each pixel has color values (Red, Green, Blue). Changing the very last bit of these values (the "least significant" one) changes the color so slightly that human eyes cannot notice the difference.</p>
+            <p>However, we can use these bits to store data—like your signature, copyright info, or a unique ID.</p>
+          </div>
+          <div>
+            <h4 style="color: var(--primary-color);">Why use it?</h4>
+            <ul style="list-style-type: disc; padding-left: 1.5rem; line-height: 1.6;">
+              <li><strong>Provenance:</strong> Prove you are the original creator of an artwork.</li>
+              <li><strong>Copyright Protection:</strong> distinct from visible signatures that can be cropped out, invisible watermarks persist across the entire image.</li>
+              <li><strong>Leak Tracking:</strong> If you share sensitive images privately, different watermarks for different recipients can help track the source of a leak.</li>
+            </ul>
+             <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+               <strong>Did you know?</strong>
+               <p style="font-size: 0.9em; margin-top: 0.5rem; color: #a0aec0;">Even major AI companies use similar techniques to "mark" AI-generated images to distinguish them from human-created art.</p>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>
+        PNGProtect is a conceptual invisible image watermarking & verification platform prototype for demonstration
+        purposes only.
+      <p class="footer-note">
+        Built as a hackathon-style front-end demo.
+      </p>
+      <a href="https://github.com/ApurveKaranwal/PNGProtect" target="_blank" rel="noopener noreferrer"
+        class="footer-link">
+        GitHub repository
+      </a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

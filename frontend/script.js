@@ -712,9 +712,22 @@ initWatermarkFunctionality();
 // =============================
 // AI Shield Functionality
 // =============================
+// Utility: Debounce function to limit API calls during slider movement
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 function initAIShieldFunctionality() {
   try {
-    console.log("===== INITIALIZING AI SHIELD FUNCTIONALITY =====");
+    console.log("===== INITIALIZING AI SHIELD FUNCTIONALITY (WITH LIVE PREVIEW) =====");
 
     const aisDropzone = document.getElementById("ais-dropzone");
     const aisInput = document.getElementById("ais-input");
@@ -746,7 +759,16 @@ function initAIShieldFunctionality() {
 
     if (aisStrength) {
       updateShieldLabel(aisStrength.value);
-      aisStrength.addEventListener("input", (e) => updateShieldLabel(e.target.value));
+      aisStrength.addEventListener("input", (e) => {
+        updateShieldLabel(e.target.value);
+
+        // Immediate visual feedback so user knows it's pending
+        aisScore.textContent = "...";
+        aisScore.style.opacity = "0.5";
+
+        // Trigger debounced live preview
+        debouncedApplyProtection();
+      });
     }
 
     let currentAISFile = null;
@@ -768,14 +790,9 @@ function initAIShieldFunctionality() {
       aisDownloadBtn.disabled = true;
     });
 
-    // Apply Shield Button
-    aisBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      if (!currentAISFile) {
-        aisDropzone.classList.add("drag-over");
-        setTimeout(() => aisDropzone.classList.remove("drag-over"), 600);
-        return;
-      }
+    // Reusable function for applying protection
+    async function applyProtection() {
+      if (!currentAISFile) return;
 
       const strengthVal = aisStrength.value;
       console.log("Applying AI Shield with strength:", strengthVal);
@@ -783,13 +800,15 @@ function initAIShieldFunctionality() {
       // UI Loading state
       aisBtn.classList.add("loading");
       aisBtn.disabled = true;
-      aisStatus.className = "status-pill status-loading";
-      aisStatus.textContent = "Generating adversarial noise...";
+      aisStatus.className = "status-pill status-processing"; // Blue/Processing state
+      aisStatus.textContent = "Updating preview...";
+      aisScore.textContent = "Calculating...";
+      aisScore.style.opacity = "0.5";
 
       try {
         const formData = new FormData();
         formData.append("file", currentAISFile);
-        formData.append("strength", strengthVal); // Backend handles mapping
+        formData.append("strength", strengthVal);
 
         const response = await fetch(`${API_BASE}/protect/process`, {
           method: "POST",
@@ -800,8 +819,20 @@ function initAIShieldFunctionality() {
           throw new Error(`Protection failed: ${response.statusText}`);
         }
 
-        // Get headers
-        const robustness = response.headers.get("X-Robustness-Score") || "N/A";
+        // Extensive logging for debugging
+        console.log("Response headers:", [...response.headers.entries()]);
+
+        // Try multiple variations just in case
+        let robustness = response.headers.get("X-Robustness-Score") ||
+          response.headers.get("x-robustness-score") ||
+          "N/A";
+
+        if (robustness === "N/A") {
+          console.warn("Robustness header missing!");
+          robustness = "Error";
+        } else {
+          console.log("Robustness Score received:", robustness);
+        }
 
         // Get blob
         const protectedBlob = await response.blob();
@@ -810,6 +841,7 @@ function initAIShieldFunctionality() {
         // Update UI with result
         aisPreview.src = protectedUrl;
         aisScore.textContent = `${robustness}%`;
+        aisScore.style.opacity = "1";
 
         aisStatus.className = "status-pill status-success";
         aisStatus.textContent = "Protection Applied";
@@ -825,18 +857,31 @@ function initAIShieldFunctionality() {
           a.remove();
         };
 
-        // Show success notification
-        showNotification("Image protected successfully!", "success");
-
       } catch (err) {
         console.error("AI Shield Error:", err);
         aisStatus.className = "status-pill status-error";
-        aisStatus.textContent = "Protection Failed";
-        showNotification(`Error: ${err.message}`, "error");
+        aisStatus.textContent = "Preview Failed";
+        aisScore.textContent = "Error";
+        // Only show full notification on button click to avoid spamming toast on slider error
       } finally {
         aisBtn.classList.remove("loading");
         aisBtn.disabled = false;
       }
+    }
+
+    // Debounce the apply function (500ms delay)
+    const debouncedApplyProtection = debounce(applyProtection, 500);
+
+    // Apply Shield Button (Immediate trigger)
+    aisBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!currentAISFile) {
+        aisDropzone.classList.add("drag-over");
+        setTimeout(() => aisDropzone.classList.remove("drag-over"), 600);
+        return;
+      }
+      // Cancel any pending debounced call and run immediately
+      applyProtection();
     });
 
   } catch (e) {
@@ -1342,7 +1387,16 @@ function initStripMetadataFunctionality() {
       smStatus.textContent = "Metadata successfully removed!";
       smStatus.className = "status-pill status-success";
       smCleanedSize.textContent = formatFileSize(cleanedSize);
-      smReduction.textContent = `${reductionPercent}%`;
+
+      if (reduction >= 0) {
+        smReduction.textContent = `${reductionPercent}%`;
+        smReduction.style.color = "var(--success)"; // Green
+      } else {
+        // Size increased (likely due to JPEG -> PNG conversion)
+        const increase = Math.abs(reductionPercent);
+        smReduction.textContent = `+${increase}% (Inc. Quality)`;
+        smReduction.style.color = "var(--warning)"; // Yellow
+      }
 
       // Enable download button
       smDownloadBtn.disabled = false;
@@ -1520,6 +1574,7 @@ function initDetectionFunctionality() {
     const confidence = result.overall_tampering_confidence || 0;
     const confidenceLevel = result.confidence_level || 'Unknown';
     const likelyRemoved = result.likely_removed === true;
+    const detectedTechniques = result.detected_techniques || [];
 
     // Update status
     detStatus.textContent = `Analysis complete - ${confidenceLevel} confidence`;
@@ -1528,59 +1583,88 @@ function initDetectionFunctionality() {
     // Display confidence score
     detConfidenceContainer.style.display = 'block';
     detConfidenceValue.textContent = `${Math.round(confidence)}%`;
-    detConfidenceFill.style.width = `${confidence}%`;
+    // Ensure bar is at least a little visible (4%) so the color shows up
+    detConfidenceFill.style.width = `${Math.max(confidence, 4)}%`;
 
     // Update color based on confidence
     if (confidence >= 70) {
       detConfidenceFill.style.background = 'linear-gradient(90deg, #f97373, #ff6b6b)';
-      detConfidenceLevel.textContent = `Likelihood: Very High (${confidenceLevel})`;
+      detConfidenceLevel.innerHTML = `<strong>Tampering Likelihood: Very High</strong><br>The image shows strong signs of manipulation.`;
     } else if (confidence >= 50) {
       detConfidenceFill.style.background = 'linear-gradient(90deg, #facc15, #fbbf24)';
-      detConfidenceLevel.textContent = `Likelihood: Medium (${confidenceLevel})`;
+      detConfidenceLevel.innerHTML = `<strong>Tampering Likelihood: Moderate</strong><br>Some suspicious patterns detected. Manual review recommended.`;
     } else if (confidence >= 30) {
       detConfidenceFill.style.background = 'linear-gradient(90deg, #22d3ee, #06b6d4)';
-      detConfidenceLevel.textContent = `Likelihood: Low (${confidenceLevel})`;
+      detConfidenceLevel.innerHTML = `<strong>Tampering Likelihood: Low</strong><br>Minor anomalies found, but likely authentic.`;
     } else {
       detConfidenceFill.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
-      detConfidenceLevel.textContent = `Likelihood: Minimal (${confidenceLevel})`;
+      detConfidenceLevel.innerHTML = `<strong>Tampering Likelihood: Minimal</strong><br>The image appears to be authentic.`;
     }
 
-    // Display verdict
+    // Display verdict banner
     detVerdictContainer.style.display = 'block';
     if (likelyRemoved) {
+      detVerdictIcon.textContent = '❌';
+      detVerdictContainer.style.borderLeftColor = '#ef4444';
+      detVerdictContainer.style.background = 'rgba(239, 68, 68, 0.1)';
+      detVerdictTitle.textContent = 'Suspicious Modification Detected';
+      detVerdictText.textContent = 'Significant artifacts suggest the watermark may have been removed or the image altered.';
+    } else if (confidence > 40) {
       detVerdictIcon.textContent = '⚠️';
-      detVerdictContainer.style.borderLeftColor = '#f97373';
-      detVerdictTitle.textContent = 'Likely Tampering Detected';
-      detVerdictText.textContent = 'The image shows signs of watermark removal or significant modification.';
-    } else if (confidence > 30) {
-      detVerdictIcon.textContent = '⚠️';
-      detVerdictContainer.style.borderLeftColor = '#facc15';
-      detVerdictTitle.textContent = 'Possible Tampering';
-      detVerdictText.textContent = 'The image may have been modified. Manual review recommended.';
+      detVerdictContainer.style.borderLeftColor = '#eab308';
+      detVerdictContainer.style.background = 'rgba(234, 179, 8, 0.1)';
+      detVerdictTitle.textContent = 'Potential Anomalies Found';
+      detVerdictText.textContent = 'Some tests showed irregular results. The image may be slightly edited or re-saved.';
     } else {
       detVerdictIcon.textContent = '✅';
       detVerdictContainer.style.borderLeftColor = '#22c55e';
-      detVerdictTitle.textContent = 'Image Integrity Intact';
-      detVerdictText.textContent = 'No significant signs of watermark tampering detected.';
+      detVerdictContainer.style.background = 'rgba(34, 197, 94, 0.1)';
+      detVerdictTitle.textContent = 'Authentic Image';
+      detVerdictText.textContent = 'Passed all major forensic integrity checks. No evidence of malicious tampering.';
     }
 
-    // Display techniques
-    if (result.detected_techniques && result.detected_techniques.length > 0) {
-      detTechniquesContainer.style.display = 'block';
-      detTechniquesList.innerHTML = result.detected_techniques
-        .map(technique => `
-          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
-            <span style="color: #facc15;">◆</span>
-            <span style="color: var(--text-soft);">${technique}</span>
+    // "Scorecard" View for Techniques
+    detTechniquesContainer.style.display = 'block';
+
+    // Define the standard checks we perform (mapping technical IDs to user-friendly names)
+    const forensicsChecks = [
+      { id: 'Blur', name: 'Image Sharpness', desc: 'Checks for smoothing or blurring usage' },
+      { id: 'Noise Inconsistency', name: 'Digital Noise Structure', desc: 'Analyzes consistency of pixel noise' },
+      { id: 'Recompression', name: 'Compression Artifacts', desc: 'Looks for double-compression signs' },
+      { id: 'Edge Anomalies', name: 'Edge Integrity', desc: 'Checks boundaries for unnatural edits' },
+      { id: 'Frequency Anomaly', name: 'Frequency Analysis', desc: 'Scans hidden data layers' }
+    ];
+
+    // Generate the list items
+    detTechniquesList.innerHTML = forensicsChecks.map(check => {
+      // Is this check in the "detected" list?
+      // detectedTechniques contains raw strings from backend, e.g. "Blur", "Recompression"
+      const isFailed = detectedTechniques.some(t => t.includes(check.id));
+
+      const icon = isFailed ? '⚠️' : '✅';
+      const color = isFailed ? '#facc15' : '#86efac'; // Yellow : Green
+      const statusText = isFailed ? 'Suspicious' : 'Normal';
+
+      return `
+        <div style="display: flex; align-items: start; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 4px;">
+          <span style="font-size: 1.2rem; line-height: 1;">${icon}</span>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+               <span style="font-weight: 500; color: #e2e8f0;">${check.name}</span>
+               <span style="font-size: 0.85rem; color: ${color}; font-weight: 600;">${statusText}</span>
+            </div>
+            <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #94a3b8;">${check.desc}</p>
           </div>
-        `)
-        .join('');
-    }
+        </div>
+      `;
+    }).join('');
 
-    // Display forensic explanation
-    if (result.forensic_explanation) {
+    // Display forensic explanation if available (hide if empty or generic)
+    if (result.forensic_explanation && result.forensic_explanation.length > 20) {
       detExplanationContainer.style.display = 'block';
       detExplanationText.textContent = result.forensic_explanation;
+    } else {
+      detExplanationContainer.style.display = 'none';
     }
 
     // Store technical summary for toggle

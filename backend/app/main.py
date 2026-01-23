@@ -23,7 +23,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-Robustness-Score"]
+    expose_headers=["X-Robustness-Score", "x-robustness-score"]
 )
 
 app.include_router(watermark.router, prefix="/watermark", tags=["Watermark"])

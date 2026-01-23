@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Verify Ownership | PNGProtect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Animated gradient + particles background -->
+    <div class="bg-gradient"></div>
+    <canvas id="bg-particles"></canvas>
+
+    <!-- Top navigation -->
+    <header class="top-nav">
+        <div class="logo">
+            <span class="logo-dot"></span>
+            <a href="index.html" style="text-decoration: none; color: inherit;"><span>PNGProtect</span></a>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="watermark.html">Watermark</a>
+            <a href="ai-shield.html">AI Shield</a>
+            <a href="verify.html" class="active">Verify</a>
+            <a href="detect.html">Detect Tampering</a>
+            <a href="cleanup.html">Clean</a>
+        </nav>
+        <div class="user-area">
+            <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
+            <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
+            <span id="wallet-address" class="wallet-address">Not connected</span>
+            <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
+                title="Toggle light/dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- VERIFY IMAGE SECTION -->
+        <section id="verify" class="section" style="padding-top: 80px;">
+            <div class="section-header">
+                <h2>Verify Image</h2>
+                <p>Check if an invisible watermark and owner ID can be recovered.</p>
+            </div>
+
+            <div class="layout-grid">
+                <!-- Upload -->
+                <div class="glass card">
+                    <h3>Upload Image to Verify</h3>
+
+                    <div id="vf-dropzone" class="dropzone">
+                        <input type="file" id="vf-input" accept="image/*" hidden />
+                        <div class="dropzone-inner">
+                            <span class="drop-icon">🔍</span>
+                            <p>Drop an image to verify</p>
+                            <p class="drop-subtext">or click to browse</p>
+                        </div>
+                    </div>
+                    <img id="vf-preview" class="preview-image"
+                        style="margin: 1rem auto; display: none; max-height: 200px; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"
+                        alt="Verify Preview" />
+
+                    <button id="vf-btn" class="btn primary full">
+                        <span class="btn-label">Verify Watermark</span>
+                        <span class="btn-spinner"></span>
+                    </button>
+
+                    <p class="hint">
+                        In production, verification would decode embedded watermark data and validate it
+                        cryptographically.
+                    </p>
+                </div>
+
+                <!-- Result card -->
+                <div class="glass card result-card">
+                    <h3>Verification Result</h3>
+
+                    <div id="vf-status" class="status-pill status-idle">
+                        Waiting for an image…
+                    </div>
+
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <span class="result-label">Watermark detected</span>
+                            <span id="vf-detected" class="result-value">–</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Owner ID</span>
+                            <span id="vf-owner" class="result-value">–</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Confidence</span>
+                            <span id="vf-confidence" class="result-value">–</span>
+                        </div>
+                    </div>
+
+                    <!-- Animated bars for success -->
+                    <div class="confidence-bars" id="vf-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+
+                    <div style="margin-top:1rem; display:flex; gap:8px; align-items:center;">
+                        <button id="register-onchain-btn" class="btn primary" disabled>Register Ownership
+                            On-Chain</button>
+                        <div id="register-status" style="font-size:0.9rem;color:#94a3b8;">Not registered</div>
+                    </div>
+
+                    <p class="hint">
+                        Confidence is randomly generated in this demo and does not reflect real model certainty.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAILED INFO SECTION -->
+        <section class="section">
+            <div class="glass card" style="max-width: 1000px; margin: 0 auto;">
+                <h3>Ownership Verification</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--primary-color);">Blind Verification</h4>
+                        <p>Our verification process is "blind"—it doesn't need the original image to find the watermark.
+                            This allows anyone to verify an image found in the wild without needing access to your
+                            private archives.</p>
+
+                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">Cryptographic Confidence</h4>
+                        <p>Verification isn't just a "yes/no". We provide a <strong>Confidence Score</strong>. If an
+                            image has been heavily compressed (like on social media) or cropped, the watermark signal
+                            might be weaker. The score tells you how likely it is that the detected ID is genuine.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary-color);">On-Chain Registry</h4>
+                        <p>For ultimate proof, ownership claims can be registered on the <strong>Blockchain</strong>
+                            (Ethereum/Polygon).</p>
+                        <p>When you "Register Ownership On-Chain", we create a permanent, immutable record linking your
+                            watermarked image's hash to your wallet address. This provides court-admissible proof of
+                            existence at a specific point in time.</p>
+                        <div
+                            style="margin-top: 1rem; padding: 0.8rem; border-left: 3px solid #3b82f6; background: rgba(59, 130, 246, 0.1);">
+                            <strong>Connect Wallet:</strong> Use the button in the top right to enable blockchain
+                            features.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>
+                PNGProtect is a conceptual invisible image watermarking & verification platform prototype for
+                demonstration
+                purposes only.
+            <p class="footer-note">
+                Built as a hackathon-style front-end demo.
+            </p>
+            <a href="https://github.com/ApurveKaranwal/PNGProtect" target="_blank" rel="noopener noreferrer"
+                class="footer-link">
+                GitHub repository
+            </a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

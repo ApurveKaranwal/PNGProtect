@@ -5,11 +5,11 @@ from PIL import Image
 def load_image_from_bytes(raw_bytes: bytes) -> Image.Image:
     return Image.open(io.BytesIO(raw_bytes)).convert("RGB")
 
-def save_image_to_bytes(image: Image.Image, format_hint: str = "png") -> io.BytesIO:
+def save_image_to_bytes(image: Image.Image, format_hint: str = "png", **kwargs) -> io.BytesIO:
     buf = io.BytesIO()
     # LSB requires lossless (PNG). If JPEG is passed, we force PNG for the watermark to survive
     save_format = "PNG" if "png" in format_hint.lower() or "jpg" in format_hint.lower() or "jpeg" in format_hint.lower() else "PNG"
-    image.save(buf, format=save_format)
+    image.save(buf, format=save_format, **kwargs)
     buf.seek(0)
     return buf
 

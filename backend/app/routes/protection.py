@@ -32,7 +32,7 @@ async def process_protection(
         
         epsilon = strength
         if strength > 1.0:
-            epsilon = (strength / 100.0) * 0.05
+            epsilon = (strength / 100.0) * 0.20
         
         protected_bytes, robustness = protector.protect_image(content, strength=epsilon)
 
