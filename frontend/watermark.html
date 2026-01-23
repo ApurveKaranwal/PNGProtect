@@ -31,7 +31,8 @@
       <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
       <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
       <span id="wallet-address" class="wallet-address">Not connected</span>
-      <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle" title="Toggle light/dark mode">🌙</button>
+      <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
+        title="Toggle light/dark mode">🌙</button>
     </div>
   </header>
 
@@ -127,24 +128,44 @@
         <h3>About Invisible Watermarking</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
           <div>
-            <h4 style="color: var(--primary-color);">What is it?</h4>
-            <p>Invisible watermarking is the process of embedding information into digital content (like images) in a way that is not visible to the human eye but can be detected by computer algorithms.</p>
-            
-            <h4 style="color: var(--primary-color); margin-top: 1.5rem;">How it works (LSB Steganography)</h4>
-            <p>Our method utilizes <strong>Least Significant Bit (LSB) Steganography</strong>. Digital images are made of pixels, and each pixel has color values (Red, Green, Blue). Changing the very last bit of these values (the "least significant" one) changes the color so slightly that human eyes cannot notice the difference.</p>
-            <p>However, we can use these bits to store data—like your signature, copyright info, or a unique ID.</p>
+            <h4 style="color: var(--primary-color);">What is Invisible Watermarking?</h4>
+            <p>Invisible watermarking is the science of embedding imperceptible information into digital content. Unlike
+              a visible logo or signature that covers the artwork, an invisible watermark is woven into the very fabric
+              of the image's data.</p>
+
+            <h4 style="color: var(--primary-color); margin-top: 1.5rem;">Technical Deep Dive: LSB Steganography</h4>
+            <p>Our implementation utilizes <strong>Least Significant Bit (LSB) Steganography</strong>. Here is how it
+              works under the hood:</p>
+            <ul style="list-style-type: none; padding-left: 0; line-height: 1.6; font-size: 0.95em;">
+              <li style="margin-bottom: 0.5rem;">🔹 <strong>Pixel Data:</strong> An image is a grid of pixels. Each
+                pixel has Red, Green, and Blue values (0-255).</li>
+              <li style="margin-bottom: 0.5rem;">🔹 <strong>Binary Conversion:</strong> The value 255 in binary is
+                <code>11111111</code>. The last digit is the "Current LSB".</li>
+              <li style="margin-bottom: 0.5rem;">🔹 <strong>Injection:</strong> We replace this last bit with a bit from
+                your encrypted Owner ID.</li>
+              <li>🔹 <strong>Result:</strong> Changing 255 to 254 (<code>11111110</code>) is visually identical to the
+                human eye, but a computer can read that last bit to reconstruct the message.</li>
+            </ul>
           </div>
           <div>
-            <h4 style="color: var(--primary-color);">Why use it?</h4>
+            <h4 style="color: var(--primary-color);">Use Cases & Limitations</h4>
             <ul style="list-style-type: disc; padding-left: 1.5rem; line-height: 1.6;">
-              <li><strong>Provenance:</strong> Prove you are the original creator of an artwork.</li>
-              <li><strong>Copyright Protection:</strong> distinct from visible signatures that can be cropped out, invisible watermarks persist across the entire image.</li>
-              <li><strong>Leak Tracking:</strong> If you share sensitive images privately, different watermarks for different recipients can help track the source of a leak.</li>
+              <li><strong>Provenance & Authentication:</strong> Prove you are the original creator of an artwork by
+                retrieving a hidden ID that only you could have embedded.</li>
+              <li><strong>Leak Tracking:</strong> If you send a sensitive image to three people, you can embed a unique
+                ID (e.g., "User A", "User B") for each. If the image leaks, you can decode it to see exactly who leaked
+                it.</li>
+              <li style="color: var(--warning); margin-top: 0.5rem;"><strong>Robustness Note:</strong> LSB watermarks
+                are "fragile". They survive lossless saving (PNG) but are easily destroyed by heavy JPEG compression or
+                resizing. For robust protection against attacks, consider our "AI Shield" feature.</li>
             </ul>
-             <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-               <strong>Did you know?</strong>
-               <p style="font-size: 0.9em; margin-top: 0.5rem; color: #a0aec0;">Even major AI companies use similar techniques to "mark" AI-generated images to distinguish them from human-created art.</p>
-             </div>
+            <div
+              style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid var(--accent-blue);">
+              <strong>Industry Context</strong>
+              <p style="font-size: 0.9em; margin-top: 0.5rem; color: #cbd5e1;">Major AI labs like Google DeepMind
+                (SynthID) and Meta use advanced frequency-domain watermarking to label AI-generated content. Our tool
+                provides a simplified, accessible version of this technology for creators.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -170,4 +191,5 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>

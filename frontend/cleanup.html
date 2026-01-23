@@ -108,22 +108,39 @@
                 <h3>Why Clean Metadata?</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div>
-                        <h4 style="color: var(--primary-color);">Hidden Data Dangers</h4>
-                        <p>Photos taken with modern cameras and smartphones contain a treasure trove of hidden data
-                            called <strong>EXIF data</strong>. This can include:</p>
+                        <h4 style="color: var(--primary-color);">The Invisible Data Leak</h4>
+                        <p>When you take a photo, your camera records much more than just the image. It embeds a hidden
+                            layer of data called <strong>EXIF (Exchangeable Image File Format)</strong>. </p>
+                        <p>This data is invisible in standard viewers but easily readable by anyone who downloads your
+                            file. Common leaks include:</p>
                         <ul
-                            style="list-style-type: none; padding-left: 0; line-height: 1.6; font-size: 0.9em; color: var(--text-soft);">
-                            <li>📍 <strong>GPS Coordinates:</strong> Exact location where the photo was taken.</li>
-                            <li>📅 <strong>Timestamps:</strong> Exact date and time used.</li>
-                            <li>📱 <strong>Device Info:</strong> Phone model and serial numbers.</li>
+                            style="list-style-type: none; padding-left: 0; line-height: 1.6; font-size: 0.95em; color: var(--text-soft);">
+                            <li style="margin-bottom: 0.5rem;">📍 <strong>GPS Coordinates:</strong> Pinpoints your exact
+                                home address or location to within 5 meters.</li>
+                            <li style="margin-bottom: 0.5rem;">📅 <strong>Timestamps:</strong> Exact day, minute, and
+                                second the photo was taken.</li>
+                            <li style="margin-bottom: 0.5rem;">📸 <strong>Device Fingerprint:</strong> Camera model,
+                                serial number, and software version—unique identifiers that can link anonymous photos to
+                                your identity.</li>
                         </ul>
                     </div>
                     <div>
-                        <h4 style="color: var(--primary-color);">Privacy First</h4>
-                        <p>Sharing a raw photo online is like sharing your location history. Aggressive metadata
-                            stripping removes 100% of this hidden information, leaving only the visual pixel data.</p>
-                        <p>This is crucial for privacy-conscious users, whistleblowers, or anyone who simply doesn't
-                            want big tech tracking their movement patterns through their photo uploads.</p>
+                        <h4 style="color: var(--primary-color);">Advanced Cleaning</h4>
+                        <p>Most basic "remove properties" tools in operating systems miss the deeper data. PNGProtect
+                            performs deep-cleaning:</p>
+                        <ul
+                            style="list-style-type: disc; padding-left: 1.5rem; line-height: 1.6; color: var(--text-soft);">
+                            <li><strong>Thumbnail Stripping:</strong> Cameras embed a small preview thumbnail in the
+                                file. Even if you crop the main image, the <em>original uncropped thumbnail</em> often
+                                remains hidden in the metadata! we remove this.</li>
+                            <li><strong>Color Profiles:</strong> We strip complex ICC color profiles that can sometimes
+                                contain identifying tags.</li>
+                            <li><strong>Anonymization:</strong> The final output is a pure pixel stream, re-encoded from
+                                scratch to ensure zero data persistence.</li>
+                        </ul>
+                        <div style="margin-top: 1rem; color: var(--success); font-weight: 500;">
+                            ✓ Safe for Public Distribution
+                        </div>
                     </div>
                 </div>
             </div>

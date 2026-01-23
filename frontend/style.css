@@ -1617,3 +1617,154 @@ body.light-mode .workflow-info h3 {
 body.light-mode .workflow-info p {
   color: #1e293b;
 }
+
+/* ===========================
+   ANIMATIONS & MICRO-INTERACTIONS
+   =========================== */
+
+/* Staggered Entry Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base animation class */
+.animate-entry {
+  opacity: 0;
+  /* Start invisible */
+  animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Stagger delays */
+.delay-1 {
+  animation-delay: 0.1s;
+}
+
+.delay-2 {
+  animation-delay: 0.2s;
+}
+
+.delay-3 {
+  animation-delay: 0.3s;
+}
+
+.delay-4 {
+  animation-delay: 0.4s;
+}
+
+/* Apply to common elements automatically if not manually tagged */
+.hero-content,
+.section-header,
+.card,
+.features-grid>*,
+.steps-grid>*,
+#watermark,
+#ai-shield,
+#verify,
+#detect,
+#strip {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.hero-content {
+  animation-delay: 0.1s;
+}
+
+.section-header {
+  animation-delay: 0.2s;
+}
+
+.card {
+  animation-delay: 0.3s;
+}
+
+.features-grid>*:nth-child(1) {
+  animation-delay: 0.4s;
+}
+
+.features-grid>*:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.features-grid>*:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+/* Enhanced Gradient Typography */
+h1,
+h2,
+.hero-title {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Standard fallbacks handled by clip */
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.hero-title {
+  background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode .hero-title {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+}
+
+/* Premium Glass Hover Effects */
+.glass {
+  /* Existing styles preserved via cascade, adding interactive flair */
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.glass:hover {
+  transform: translateY(-4px) scale(1.005);
+  box-shadow:
+    0 20px 60px -10px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(148, 163, 184, 0.3);
+  /* Subtle internal glow border */
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+body.light-mode .glass:hover {
+  box-shadow:
+    0 20px 60px -10px rgba(59, 130, 246, 0.15),
+    0 0 0 1px rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Pulse Animation for active elements */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.btn.primary:not(:disabled):hover {
+  animation: softPulse 2s infinite;
+}

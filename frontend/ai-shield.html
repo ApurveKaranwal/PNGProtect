@@ -118,33 +118,44 @@
                 <h3>About AI Shield Protection</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div>
-                        <h4 style="color: var(--primary-color);">Defending Against Scrapers</h4>
-                        <p>Generative AI models are trained on billions of images scraped from the internet, often
-                            without the consent of the original artists. AI Shield provides a layer of defense against
-                            this mass scraping.</p>
+                        <h4 style="color: var(--primary-color);">The Problem: AI Scraping</h4>
+                        <p>Generative AI models (like Stable Diffusion, Midjourney) are trained on billions of images
+                            scraped from the open web—often without the artist's consent. Once your style is absorbed
+                            into the model, anyone can generate endless imitations, effectively treating your life's
+                            work as free training data.</p>
 
-                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">Adversarial Perturbations</h4>
-                        <p>AI Shield works by injecting <strong>adversarial perturbations</strong>—essentially "noise"
-                            designed mathematically to confuse machine learning models.</p>
-                        <p>While a human sees a "cat", the slight alterations in pixel values might trick an AI into
-                            seeing "toaster" or just nonsense static. This effectively "poisons" the data for training
-                            purposes, making your artwork useless to scrapers.</p>
+                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">The Solution: Adversarial
+                            Perturbations</h4>
+                        <p>AI Shield works by injecting a mathematically computed "mist" over your image. This is known
+                            as an <strong>Adversarial Attack</strong>.</p>
+                        <p>AI models "see" images by identifying patterns (edges, textures, shapes). Our shield slightly
+                            alters the pixel values to maximize the model's error rate. While a human sees "Portrait of
+                            a Lady," the AI's numerical view is chaotically disrupted, causing it to misclassify the
+                            image as "Oven" or "Noise".</p>
                     </div>
                     <div>
-                        <h4 style="color: var(--primary-color);">Protection Levels</h4>
+                        <h4 style="color: var(--primary-color);">Understanding Protection Levels</h4>
+                        <p>There is an inherent trade-off between visual purity and protection strength:</p>
                         <ul style="list-style-type: none; padding-left: 0; line-height: 1.6;">
-                            <li style="margin-bottom: 0.5rem;"><strong>30% (Low):</strong> Minimal changes. Best for
-                                high-fidelity photography where visual purity is paramount.</li>
-                            <li style="margin-bottom: 0.5rem;"><strong>50% (Standard):</strong> The best balance. Hard
-                                for AI to process, but still looks great to humans.</li>
-                            <li style="margin-bottom: 0.5rem;"><strong>80%+ (High):</strong> Aggressive protection. May
-                                introduce visible grain, but offers maximum resistance against robust scraping models.
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong>🛡️ Low (30%):</strong> Prioritizes aesthetics. Best for portfolio display where
+                                visual fidelity is critical. Offers resistance against weak scrapers but may be bypassed
+                                by robust models.
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong>🛡️ Standard (50%):</strong> The "Goldilocks" zone. Introduces slight,
+                                film-grain-like noise that is visible upon close inspection but highly effective against
+                                standard CLIP/ResNet encoders.
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong>🛡️ High (80%+):</strong> Maximum defense. Creates visible patterns/artifacts.
+                                Use this for concept art or sketches you absolutely do not want learned by AI.
                             </li>
                         </ul>
                         <div
-                            style="margin-top: 1.5rem; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.2);">
-                            <strong>Protects against:</strong> ResNet, CLIP, ViT, and other common computer vision
-                            architectures used in Stable Diffusion, Midjourney, etc.
+                            style="margin-top: 1.5rem; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 8px; border-left: 3px solid var(--accent-purple);">
+                            <strong>Target Architectures:</strong> Tested against CLIP (OpenAI), ResNet-50, and Vision
+                            Transformers (ViT), which are the eyes of most modern generative AI systems.
                         </div>
                     </div>
                 </div>

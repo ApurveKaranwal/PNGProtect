@@ -1234,6 +1234,14 @@ function initVerifyFunctionality() {
       vfBars.classList.add("flash");
       setTimeout(() => vfBars.classList.remove("flash"), 400);
 
+      // Re-trigger card animation to draw attention
+      const resultCard = document.querySelector('#verify .result-card');
+      if (resultCard) {
+        resultCard.style.animation = 'none';
+        resultCard.offsetHeight; /* trigger reflow */
+        resultCard.style.animation = 'slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      }
+
     } catch (error) {
       console.error("Verification error:", error);
       vfStatus.textContent = "✗ Verification failed";

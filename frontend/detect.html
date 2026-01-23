@@ -153,31 +153,54 @@
         <section class="section">
             <div class="glass card" style="max-width: 1000px; margin: 0 auto;">
                 <div class="workflow-info" style="margin: 0;">
-                    <h3>How Tampering Detection Works</h3>
+                    <h3>Hybrid Forensic Analysis System</h3>
                     <p>
-                        Our detection system uses a <strong>hybrid approach</strong> combining forensic analysis and
-                        machine learning:
+                        Image tampering leaves behind invisible mathematical scars. Our system combines
+                        <strong>traditional signal processing</strong> with <strong>modern machine learning</strong> to
+                        expose these anomalies.
                     </p>
-                    <ul style="color: var(--text-soft); line-height: 1.8;">
-                        <li><strong>Blur Detection:</strong> Analyzes Laplacian variance to detect image smoothing or
-                            blur effects.
-                        </li>
-                        <li><strong>Noise Inconsistency:</strong> Detects unnatural noise patterns that indicate
-                            post-processing.</li>
-                        <li><strong>Compression Artifacts:</strong> Identifies JPEG blocking and compression anomalies.
-                        </li>
-                        <li><strong>Edge Anomalies:</strong> Finds unusual edge density that suggests watermark removal.
-                        </li>
-                        <li><strong>Frequency Analysis:</strong> Uses FFT to detect frequency domain artifacts.</li>
-                        <li><strong>ML Classification:</strong> Trained model uses 40+ statistical features for advanced
-                            detection.
-                        </li>
-                    </ul>
-                    <p style="margin-bottom: 0; margin-top: 1rem;">
-                        The system provides a <strong>confidence score (0-100%)</strong> indicating the likelihood of
-                        watermark
-                        tampering, along with specific artifacts detected and human-readable explanations.
-                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                        <div>
+                            <h4 style="color: var(--accent-blue); font-size: 1rem;">Signal Processing Layer</h4>
+                            <ul
+                                style="color: var(--text-soft); line-height: 1.6; font-size: 0.95rem; padding-left: 1.2rem;">
+                                <li style="margin-bottom: 0.8rem;">
+                                    <strong>Laplacian Edge Detection:</strong> When an object is pasted from another
+                                    image, the edges often have mismatched sharpness. We analyze the variance of the
+                                    Laplacian text to spot these inconsistencies.
+                                </li>
+                                <li style="margin-bottom: 0.8rem;">
+                                    <strong>Error Level Analysis (ELA):</strong> Different parts of an image compressed
+                                    at different times show different error rates. ELA highlights "newer" pixels (edits)
+                                    in bright colors against the background.
+                                </li>
+                                <li style="margin-bottom: 0.8rem;">
+                                    <strong>Frequency Analysis (FFT):</strong> Copy-move forgery often creates periodic
+                                    patterns in the frequency domain. We use Fast Fourier Transform to spot these
+                                    unnatural repetitions.
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--accent-purple); font-size: 1rem;">AI Classification Layer</h4>
+                            <p style="font-size: 0.95rem; color: var(--text-soft);">
+                                We pass the results of the signal processing layer into a lightweight Convolutional
+                                Neural Network (CNN). The AI looks for high-level semantic inconsistencies that math
+                                alone might miss.
+                            </p>
+                            <div
+                                style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                                <strong style="color: #e2e8f0;">Understanding Results:</strong>
+                                <ul
+                                    style="margin: 0.5rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; color: #cbd5e1;">
+                                    <li><strong>Authentic (Green):</strong> Signal is consistent. No obvious edits.</li>
+                                    <li><strong>Suspicious (Red/Yellow):</strong> Conflicting noise patterns or
+                                        double-compression artifacts detected. Manual review advised.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
