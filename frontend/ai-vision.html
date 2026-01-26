@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Confusion Visualizer | PNGProtect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Animated gradient + particles background -->
+    <div class="bg-gradient"></div>
+    <canvas id="bg-particles"></canvas>
+
+    <!-- Top navigation -->
+    <header class="top-nav">
+        <div class="logo">
+            <span class="logo-dot"></span>
+            <a href="index.html" style="text-decoration: none; color: inherit;"><span>PNGProtect</span></a>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="watermark.html">Watermark</a>
+            <a href="ai-shield.html">AI Shield</a>
+            <a href="ai-vision.html" class="active">AI Vision</a>
+            <a href="verify.html">Verify</a>
+            <a href="detect.html">Detect Tampering</a>
+            <a href="cleanup.html">Clean</a>
+        </nav>
+        <div class="user-area">
+            <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
+            <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
+            <span id="wallet-address" class="wallet-address">Not connected</span>
+            <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
+                title="Toggle light/dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- AI VISION SECTION -->
+        <section id="ai-vision" class="section" style="padding-top: 80px;">
+            <div class="section-header">
+                <h2>AI Confusion Visualizer</h2>
+                <p>See exactly how adversarial attacks confuse computer vision models.</p>
+            </div>
+
+            <div class="layout-grid">
+                <!-- Upload + controls -->
+                <div class="glass card">
+                    <h3>Analyze Image</h3>
+
+                    <div id="aiv-dropzone" class="dropzone">
+                        <input type="file" id="aiv-input" accept="image/*" hidden />
+                        <div class="dropzone-inner">
+                            <span class="drop-icon">👁️</span>
+                            <p>Drag & drop image to analyze</p>
+                            <p class="drop-subtext">or click to browse</p>
+                        </div>
+                    </div>
+
+                    <div class="preview-wrapper" style="margin: 1rem 0; min-height: 150px; display: none;"
+                        id="aiv-preview-container">
+                        <img id="aiv-preview" class="preview-image" style="max-height: 200px;" />
+                    </div>
+
+                    <button id="aiv-btn" class="btn primary full" disabled>
+                        <span class="btn-label">Run Visual Analysis</span>
+                        <span class="btn-spinner"></span>
+                    </button>
+
+                    <p class="hint">
+                        This tool runs the image through ResNet50, applies a perturbation, and visualizes the confusion.
+                    </p>
+                </div>
+
+                <!-- Result card -->
+                <div class="glass card result-card">
+                    <h3>Confusion Analysis</h3>
+
+                    <div id="aiv-placeholder" style="padding: 2rem; text-align: center; color: var(--text-soft);">
+                        Run analysis to see results
+                    </div>
+
+                    <div id="aiv-results" style="display: none;">
+
+                        <div class="confusion-score-box" style="text-align: center; margin-bottom: 1.5rem;">
+                            <div
+                                style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-soft);">
+                                Confusion Score</div>
+                            <div id="aiv-score-val"
+                                style="font-size: 3rem; font-weight: 700; background: linear-gradient(to right, #f87171, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                0.00</div>
+                        </div>
+
+                        <div class="comparison-grid"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                            <div class="prediction-box"
+                                style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem;">Original Perception</h4>
+                                <div id="aiv-orig-label" style="font-weight: 600; font-size: 1.1rem; color: #60a5fa;">-
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                    <div class="progress-bar"
+                                        style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                        <div id="aiv-orig-conf-bar"
+                                            style="height: 100%; background: #60a5fa; width: 0%;"></div>
+                                    </div>
+                                    <span id="aiv-orig-conf"
+                                        style="font-size: 0.8rem; font-family: monospace;">0%</span>
+                                </div>
+                            </div>
+
+                            <div class="prediction-box"
+                                style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem;">Protected Perception</h4>
+                                <div id="aiv-prot-label" style="font-weight: 600; font-size: 1.1rem; color: #a78bfa;">-
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                    <div class="progress-bar"
+                                        style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                        <div id="aiv-prot-conf-bar"
+                                            style="height: 100%; background: #a78bfa; width: 0%;"></div>
+                                    </div>
+                                    <span id="aiv-prot-conf"
+                                        style="font-size: 0.8rem; font-family: monospace;">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4
+                            style="margin-bottom: 1rem; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                            Adversarial Noise Heatmap</h4>
+                        <div class="heatmap-wrapper"
+                            style="position: relative; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                            <img id="aiv-heatmap" style="width: 100%; display: block;" />
+                            <div
+                                style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 4px; font-size: 10px;">
+                                Normalized Difference (Jet Map)</div>
+                        </div>
+
+                        <button id="aiv-download-btn" class="btn ghost full" style="margin-top: 1.5rem;" disabled>
+                            Download Protected Image
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAILED INFO SECTION -->
+        <section class="section">
+            <div class="glass card" style="max-width: 1000px; margin: 0 auto;">
+                <h3>Understanding AI Confusion</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--primary-color);">How Machines "See"</h4>
+                        <p>Computer vision models like ResNet50 rely on specific texture and shape patterns to identify
+                            objects. They are surprisingly brittle; slight changes in pixel values can completely alter
+                            their perception.</p>
+
+                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">The Confusion Mechanic</h4>
+                        <p>We use the <strong>Fast Gradient Sign Method (FGSM)</strong> to calculate the exact noise
+                            needed to push the model's prediction away from the truth. The <strong>Confusion
+                                Score</strong> represents the total shift in confidence between the original label and
+                            the new, incorrect label.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary-color);">Visualizing the Attack</h4>
+                        <p>The heatmap shows where the adversarial noise is most intense. While these changes are subtle
+                            to the human eye, they are glaring to the AI, effectively "dazzling" it.</p>
+
+                        <div
+                            style="margin-top: 1.5rem; padding: 1rem; background: rgba(236, 72, 153, 0.1); border-radius: 8px; border-left: 3px solid #ec4899;">
+                            <strong>Why use this?</strong>
+                            <p style="font-size: 0.9em; margin-top: 0.5rem; color: #cbd5e1;">By understanding what
+                                confuses AI, we can build better protection tools (like AI Shield) that prevent
+                                unauthorized scraping without destroying image quality.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>
+                PNGProtect is a conceptual invisible image watermarking & verification platform prototype for
+                demonstration
+                purposes only.
+            <p class="footer-note">
+                Built as a hackathon-style front-end demo.
+            </p>
+            <a href="https://github.com/ApurveKaranwal/PNGProtect" target="_blank" rel="noopener noreferrer"
+                class="footer-link">
+                GitHub repository
+            </a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

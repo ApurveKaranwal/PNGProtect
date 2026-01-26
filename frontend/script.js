@@ -1477,6 +1477,11 @@ function initDetectionFunctionality() {
   let currentDetFile = null;
   let technicalDetailsVisible = false;
 
+  if (!detDropzone || !detInput || !detFullBtn) {
+    console.log('Detection elements not found, skipping detection functionality');
+    return;
+  }
+
   // Dropzone functionality
   detDropzone.addEventListener('click', () => detInput.click());
   detDropzone.addEventListener('dragover', (e) => {
@@ -1703,3 +1708,133 @@ function initDetectionFunctionality() {
 
 // Initialize detection functionality
 initDetectionFunctionality();
+
+// =============================
+// AI Vision Functionality
+// =============================
+
+function initAIVisionFunctionality() {
+  try {
+    console.log("===== INITIALIZING AI VISION FUNCTIONALITY =====");
+
+    const aivDropzone = document.getElementById("aiv-dropzone");
+    const aivInput = document.getElementById("aiv-input");
+    const aivBtn = document.getElementById("aiv-btn");
+    const aivPreviewContainer = document.getElementById("aiv-preview-container");
+    const aivPreview = document.getElementById("aiv-preview");
+    const aivResults = document.getElementById("aiv-results");
+    const aivPlaceholder = document.getElementById("aiv-placeholder");
+
+    // Result elements
+    const aivScoreVal = document.getElementById("aiv-score-val");
+    const aivOrigLabel = document.getElementById("aiv-orig-label");
+    const aivOrigConf = document.getElementById("aiv-orig-conf");
+    const aivOrigConfBar = document.getElementById("aiv-orig-conf-bar");
+    const aivProtLabel = document.getElementById("aiv-prot-label");
+    const aivProtConf = document.getElementById("aiv-prot-conf");
+    const aivProtConfBar = document.getElementById("aiv-prot-conf-bar");
+    const aivHeatmap = document.getElementById("aiv-heatmap");
+
+    if (!aivDropzone || !aivInput || !aivBtn) {
+      console.log("AI Vision elements not found, skipping functionality");
+      return;
+    }
+
+    let currentAIVFile = null;
+
+    setupDropzone(aivDropzone, aivInput, (file) => {
+      console.log("AI Vision file selected:", file.name);
+      currentAIVFile = file;
+
+      // Show preview
+      loadImagePreview(file, aivPreview);
+      aivPreviewContainer.style.display = "flex";
+
+      // Reset results
+      aivPlaceholder.style.display = "block";
+      aivResults.style.display = "none";
+
+      // Enable button
+      aivBtn.disabled = false;
+    });
+
+    aivBtn.addEventListener("click", async () => {
+      if (!currentAIVFile) return;
+
+      console.log("Analyzing image...");
+      aivBtn.classList.add("loading");
+      aivBtn.disabled = true;
+
+      try {
+        const formData = new FormData();
+        formData.append("file", currentAIVFile);
+
+        const response = await fetch(`${API_BASE}/analyze/ai-vision`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(errText || `Server error ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Analysis results:", data);
+
+        // Populate UI
+
+        // Confusion Score
+        aivScoreVal.textContent = data.confusion_score.toFixed(4);
+
+        // Original Prediction
+        const origConfPct = (data.original_prediction.confidence * 100).toFixed(1);
+        aivOrigLabel.textContent = data.original_prediction.label;
+        aivOrigConf.textContent = `${origConfPct}%`;
+        aivOrigConfBar.style.width = `${origConfPct}%`;
+
+        // Protected Prediction
+        const protConfPct = (data.protected_prediction.confidence * 100).toFixed(1);
+        aivProtLabel.textContent = data.protected_prediction.label;
+        aivProtConf.textContent = `${protConfPct}%`;
+        aivProtConfBar.style.width = `${protConfPct}%`;
+
+        // Heatmap
+        aivHeatmap.src = data.heatmap_base64;
+
+        // Show Results
+        aivPlaceholder.style.display = "none";
+        aivResults.style.display = "block";
+
+        // Enable Download Button if protected image is available
+        const aivDownloadBtn = document.getElementById("aiv-download-btn");
+        if (aivDownloadBtn && data.protected_image_base64) {
+          aivDownloadBtn.disabled = false;
+          // Store base64 data to click handler
+          aivDownloadBtn.onclick = () => {
+            const a = document.createElement("a");
+            a.href = data.protected_image_base64;
+            a.download = `protected_${currentAIVFile.name}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          };
+        }
+
+        showNotification("Analysis Complete", "success");
+
+      } catch (error) {
+        console.error("AI Vision analysis failed:", error);
+        showNotification(`Analysis Failed: ${error.message}`, "error");
+      } finally {
+        aivBtn.classList.remove("loading");
+        aivBtn.disabled = false;
+      }
+    });
+
+  } catch (e) {
+    console.error("Error initializing AI Vision:", e);
+  }
+}
+
+initAIVisionFunctionality();
