@@ -30,6 +30,16 @@ The AI Shield module implements cutting-edge adversarial attack techniques to ma
 - **Real-time Robustness Scoring**: Quantifies how resistant an image is to adversarial attacks and model interpretation
 - **Zero Visual Quality Loss**: Protected images appear identical to the naked eye—artistic integrity is preserved
 
+### 👁️ AI Confusion Visualizer
+**See exactly what the AI sees.**
+
+A powerful educational and diagnostic tool that visualizes how computer vision models perceive your images before and after protection:
+
+- **Adversarial Noise Heatmaps**: Visualize the exact pixels that are confusing the AI using Jet color maps
+- **Real-time Confusion Scoring**: rigorous metric calculating the divergence between the model's original prediction and its prediction on the protected image
+- **Perception Comparison**: Side-by-side view of how a standard ResNet50 model classifies the original vs. protected image
+- **Interactive Analysis**: Upload any image to see how "robust" it naturally is against AI recognition
+
 ### 🔐 Invisible Watermarking
 **Assert ownership with stealth and precision.**
 
@@ -108,8 +118,8 @@ PNGProtect is engineered as a modern, production-ready full-stack application wi
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **API Framework** | FastAPI 0.95+ | High-performance async REST API with automatic documentation |
-| **ML Engine** | PyTorch 2.0+ | Deep learning framework for adversarial attacks and model training |
-| **Image Processing** | OpenCV, Pillow, NumPy | Matrix operations, steganography, compression analysis |
+| **ML Engine** | PyTorch 2.0+, Torchvision | Deep learning framework for adversarial attacks and model training |
+| **Image Processing** | OpenCV, Pillow, NumPy, SciPy | Matrix operations, steganography, compression analysis |
 | **Security** | PyJWT, Passlib, Bcrypt | Authentication tokens, password hashing, cryptographic operations |
 | **Web3** | Ethers.js, Web3.py | Blockchain integration for ownership registry |
 | **Frontend** | HTML5, CSS3, ES6+ JavaScript | Responsive, accessible user interface with glassmorphism design |
@@ -152,29 +162,19 @@ app/
 
 ### Frontend Architecture (Web)
 
-A lightweight, single-page application built with vanilla web technologies:
+A modern, multi-page application (MPA) built with vanilla web technologies for maximum performance and separation of concerns:
 
 ```
 frontend/
-├── index.html              # Semantic HTML5 structure
-│   ├── Header & Navigation
-│   ├── Feature Sections (AI Shield, Watermark, Verify, Metadata)
-│   ├── Upload Interface
-│   ├── Results Display
-│   └── Settings/Config Panel
-├── script.js               # Client-side logic
-│   ├── API Communication (fetch/async-await)
-│   ├── File Handling & Validation
-│   ├── Form Processing
-│   ├── Web3 Wallet Integration
-│   ├── Image Preview & Download
-│   └── Error Handling & User Feedback
-└── style.css               # Design System
-    ├── Glassmorphism Design
-    ├── Responsive Layouts (Mobile, Tablet, Desktop)
-    ├── Dark Mode Support
-    ├── Animations & Transitions
-    └── Accessibility Features (WCAG 2.1)
+├── index.html              # Landing Page & Feature Overview
+├── ai-shield.html          # AI Shield Interface (Adversarial Protection)
+├── ai-vision.html          # AI Confusion Visualizer (Heatmaps & Analysis)
+├── watermark.html          # Watermarking Interface (Embed/Extract)
+├── verify.html             # Verification Interface
+├── detect.html             # Tampering Detection Interface
+├── cleanup.html            # Metadata Cleaning Interface
+├── script.js               # Shared Client-side logic & API Communication
+└── style.css               # Shared Design System (Glassmorphism)
 ```
 
 ### Complete Directory Structure
@@ -221,10 +221,16 @@ PNGProtect/
 │   └── venv/                         # Python virtual environment (auto-created)
 │
 ├── frontend/                         # 🎨 Client-side Interface
-│   ├── index.html                   # Main UI template (Semantic HTML5)
-│   ├── script.js                    # Application logic & API communication
-│   ├── style.css                    # Glassmorphism design system
-│   └── assets/                      # (If applicable) Images, icons, fonts
+│   ├── index.html                   # Landing page
+│   ├── ai-shield.html               # Protection tool
+│   ├── ai-vision.html               # Confusion visualizer
+│   ├── watermark.html               # Watermarking tool
+│   ├── verify.html                  # Verification tool
+│   ├── detect.html                  # Forensics tool
+│   ├── cleanup.html                 # Metadata tool
+│   ├── script.js                    # Application logic
+│   ├── style.css                    # Glassmorphism styles
+│   └── assets/                      # Images & icons
 │
 ├── .gitignore                       # Git ignore rules
 ├── LICENSE                          # MIT License
@@ -237,6 +243,7 @@ PNGProtect/
 | Method | Endpoint | Purpose | Response |
 |--------|----------|---------|----------|
 | **GET** | `/` | Health check | `{"status": "ok"}` |
+| **POST** | `/ai-vision` | Visualise AI Confusion | Heatmap + confusion score |
 | **POST** | `/protect` | Apply AI Shield protection | Protected image + robustness score |
 | **POST** | `/watermark/embed` | Embed watermark | Watermarked image |
 | **POST** | `/watermark/extract` | Extract watermark | Owner ID, metadata |
@@ -295,7 +302,7 @@ source venv/bin/activate
 .\venv\Scripts\Activate.ps1
 
 # On Windows (Command Prompt):
-.\venv\Scripts\activate.bat
+.\venv\Scripts/activate.bat
 
 # Install Dependencies
 pip install -r requirements.txt
@@ -385,6 +392,15 @@ Open your browser and navigate to: **`http://localhost:3000`**
 5. **Apply Protection**: Click "Protect Image" and wait for processing
 6. **Download**: Right-click the result and "Save Image As..." to download
 7. **Verify**: Test in any reverse image search to confirm reduced AI visibility
+
+#### Scenario 1.5: Visualizing AI Confusion
+1. **Navigate to AI Vision**: Click the "👁️ AI Vision" tab
+2. **Upload Image**: Select an image to analyze
+3. **Run Analysis**: Click "Run Visual Analysis"
+4. **View Results**:
+    - **Confusion Score**: See a numerical score of how confused the AI is
+    - **Heatmap**: View the colorful overlay showing where the adversarial noise is most effective
+    - **Prediction Change**: See how the model's top guess (e.g., "Tabby Cat") changes after protection (e.g., "Dishwasher")
 
 #### Scenario 2: Embedding & Verifying Ownership
 
