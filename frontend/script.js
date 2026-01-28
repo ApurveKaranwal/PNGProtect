@@ -1239,7 +1239,8 @@ function initVerifyFunctionality() {
       if (resultCard) {
         resultCard.style.animation = 'none';
         resultCard.offsetHeight; /* trigger reflow */
-        resultCard.style.animation = 'slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        resultCard.style.animation = 'slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        resultCard.style.opacity = '1';
       }
 
     } catch (error) {
