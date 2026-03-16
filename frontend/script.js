@@ -929,6 +929,8 @@ async function fetchRegistryAbi() {
   }
 }
 
+// ...existing code...
+
 async function connectWallet() {
   if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan) {
     console.log('Wallet UI elements not found, skipping wallet functionality');
@@ -940,7 +942,35 @@ async function connectWallet() {
     return;
   }
   try {
-    // Request accounts - this should trigger MetaMask popup
+    // Switch to Sepolia testnet first
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+    if (network.chainId !== 11155111) { // Sepolia testnet
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0xaa36a7' }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          // Sepolia not added, add it
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0xaa36a7',
+              chainName: 'Sepolia Testnet',
+              nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://sepolia.infura.io/v3/YOUR_INFURA_KEY'], // Add your key
+              blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+            }],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+    }
+
+    // Request accounts
     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
     connectedAccount = accounts && accounts[0];
     if (connectedAccount) {
@@ -961,6 +991,8 @@ async function connectWallet() {
     }
   }
 }
+
+// ...existing code...
 
 function disconnectWallet() {
   if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan || !registerBtn || !registerStatus) {
@@ -1839,3 +1871,43 @@ function initAIVisionFunctionality() {
 }
 
 initAIVisionFunctionality();
+
+// ...existing code...
+
+// Updated connectToBlockchain function for Ethereum Sepolia testnet
+async function connectToBlockchain() {
+  // ...existing code...
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const network = await provider.getNetwork();
+  if (network.chainId !== 11155111) { // Sepolia testnet
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0xaa36a7',
+            chainName: 'Sepolia Testnet',
+            nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://sepolia.infura.io/v3/YOUR_INFURA_KEY'], // Add your key
+            blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+          }],
+        });
+      }
+    }
+  }
+
+  // ...existing code...
+}
+
+// If contracts are used, update to Sepolia-deployed address
+// const contractAddress = '0xYourSepoliaContractAddress';
+// const contract = new ethers.Contract(contractAddress, abi, signer);
+
+// ...existing code...
