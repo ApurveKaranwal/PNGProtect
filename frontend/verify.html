@@ -101,11 +101,12 @@
                         <span></span><span></span><span></span><span></span><span></span>
                     </div>
 
-                    <div style="margin-top:1rem; display:flex; gap:8px; align-items:center;">
-                        <button id="register-onchain-btn" class="btn primary" disabled>Register Ownership
-                            On-Chain</button>
+                    <div style="margin-top:1rem; display:flex; gap:8px; align-items:center; flex-wrap: wrap;">
+                        <button id="register-onchain-btn" class="btn primary" disabled>Register Ownership On-Chain</button>
+                        <button id="verify-onchain-btn" class="btn primary" disabled>Verify On-Chain</button>
                         <div id="register-status" style="font-size:0.9rem;color:#94a3b8;">Not registered</div>
                     </div>
+                    <div id="register-receipt" style="margin-top:0.75rem; font-size:0.9rem; color: var(--text-soft);"></div>
 
                     <p class="hint">
                         Confidence is randomly generated in this demo and does not reflect real model certainty.

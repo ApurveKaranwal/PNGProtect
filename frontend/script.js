@@ -900,6 +900,7 @@ let registryAbi = null;
 let registryAddress = null;
 let lastExtractedText = null;
 let lastWatermarkFound = false;
+let lastRegisterTxHash = null; // For receipt & easy etherscan link
 
 const WALLET_STORAGE_KEY = "pngprotect.walletConnection.v1";
 
@@ -908,7 +909,9 @@ const connectWalletBtn = document.getElementById("connect-wallet-btn");
 const disconnectWalletBtn = document.getElementById("disconnect-wallet-btn");
 const walletAddressSpan = document.getElementById("wallet-address");
 const registerBtn = document.getElementById("register-onchain-btn");
+const verifyOnchainBtn = document.getElementById("verify-onchain-btn");
 const registerStatus = document.getElementById("register-status");
+const registerReceipt = document.getElementById("register-receipt");
 
 async function fetchRegistryAbi() {
   try {
@@ -983,7 +986,10 @@ async function connectWallet() {
       localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({ account: connectedAccount }));
     }
     await fetchRegistryAbi();
-    if (lastWatermarkFound) registerBtn.disabled = false;
+    if (lastWatermarkFound) {
+      if (registerBtn) registerBtn.disabled = false;
+      if (verifyOnchainBtn) verifyOnchainBtn.disabled = false;
+    }
   } catch (e) {
     console.error("Wallet connect failed:", e);
     if (e.code === 4001) {
@@ -995,7 +1001,7 @@ async function connectWallet() {
 // ...existing code...
 
 function disconnectWallet() {
-  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan || !registerBtn || !registerStatus) {
+  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan) {
     console.log('Wallet UI elements not found, skipping disconnect');
     return;
   }
@@ -1004,11 +1010,39 @@ function disconnectWallet() {
   walletAddressSpan.textContent = "Not connected";
   connectWalletBtn.style.display = "inline-block";
   disconnectWalletBtn.style.display = "none";
-  registerBtn.disabled = true;
-  registerStatus.textContent = "Not registered";
+
+  if (registerBtn) {
+    registerBtn.disabled = true;
+  }
+  if (registerStatus) {
+    registerStatus.textContent = "Not registered";
+  }
+
   // Clear wallet connection state from storage
   localStorage.removeItem(WALLET_STORAGE_KEY);
   console.log("Wallet disconnected");
+}
+
+function formatTimestamp(sec) {
+  if (!sec) return "Unknown";
+  const d = new Date(sec * 1000);
+  return d.toLocaleString();
+}
+
+function updateRegisterReceipt({ txHash, owner, timestamp, message }) {
+  if (!registerReceipt) return;
+
+  const etherscanTxUrl = txHash
+    ? `https://sepolia.etherscan.io/tx/${txHash}`
+    : null;
+
+  const pieces = [];
+  if (message) pieces.push(`<div>${message}</div>`);
+  if (owner) pieces.push(`<div><strong>Registered owner:</strong> ${owner}</div>`);
+  if (timestamp) pieces.push(`<div><strong>Registered at:</strong> ${formatTimestamp(timestamp)}</div>`);
+  if (etherscanTxUrl) pieces.push(`<div><a href="${etherscanTxUrl}" target="_blank" rel="noopener">View transaction on Etherscan</a></div>`);
+
+  registerReceipt.innerHTML = pieces.join("\n");
 }
 
 // =============================
@@ -1058,7 +1092,7 @@ if (disconnectWalletBtn) {
 // Clear any residual wallet data to ensure fresh state
 // =============================
 function initializeWalletState() {
-  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan || !registerBtn || !registerStatus) {
+  if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan) {
     console.log('Wallet UI elements not found, skipping wallet initialization');
     return;
   }
@@ -1070,8 +1104,10 @@ function initializeWalletState() {
   walletAddressSpan.textContent = "Not connected";
   connectWalletBtn.style.display = "inline-block";
   disconnectWalletBtn.style.display = "none";
-  registerBtn.disabled = true;
-  registerStatus.textContent = "Not registered";
+
+  if (registerBtn) registerBtn.disabled = true;
+  if (registerStatus) registerStatus.textContent = "Not registered";
+
   console.log("Wallet state initialized: disconnected");
 }
 
@@ -1130,12 +1166,76 @@ if (registerBtn) {
       registerStatus.textContent = `Pending tx ${tx.hash.slice(0, 10)}…`;
       await tx.wait();
       registerStatus.textContent = `✓ Registered (${tx.hash.slice(0, 10)}…)`;
-      console.log("Transaction confirmed!");
+      lastRegisterTxHash = tx.hash;
+      console.log("Transaction confirmed!", tx.hash);
+
+      // Update receipt pane
+      updateRegisterReceipt({
+        txHash: lastRegisterTxHash,
+        owner: connectedAccount,
+        timestamp: Math.floor(Date.now() / 1000),
+        message: "Registration transaction confirmed.",
+      });
+
+      if (verifyOnchainBtn) {
+        verifyOnchainBtn.disabled = false;
+      }
     } catch (e) {
       console.error("Register error:", e);
       registerStatus.textContent = e && e.message ? e.message.substring(0, 60) : "Registration failed";
+      updateRegisterReceipt({ message: "Registration failed. Check console for details." });
     } finally {
       registerBtn.disabled = false;
+    }
+  });
+}
+
+// Verify on-chain registration status (read-only)
+if (verifyOnchainBtn) {
+  verifyOnchainBtn.addEventListener("click", async () => {
+    if (!lastExtractedText) {
+      registerStatus.textContent = "No watermark extracted to verify";
+      return;
+    }
+
+    if (!registryAbi || !registryAddress) {
+      await fetchRegistryAbi();
+    }
+
+    if (!registryAbi || !registryAddress) {
+      registerStatus.textContent = "Unable to verify on-chain (missing contract info)";
+      return;
+    }
+
+    try {
+      registerStatus.textContent = "Checking on-chain status…";
+
+      const provider = window.ethereum
+        ? new ethers.providers.Web3Provider(window.ethereum)
+        : ethers.getDefaultProvider("sepolia");
+
+      const contract = new ethers.Contract(registryAddress, registryAbi, provider);
+      const uuidHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(lastExtractedText));
+
+      const [owner, timestamp] = await contract.getOwner(uuidHash);
+      const zero = "0x0000000000000000000000000000000000000000";
+
+      if (!owner || owner === zero) {
+        registerStatus.textContent = "Not registered on-chain";
+        updateRegisterReceipt({ message: "No on-chain record found for this watermark." });
+        return;
+      }
+
+      registerStatus.textContent = "✅ Registered on-chain";
+      updateRegisterReceipt({
+        owner,
+        timestamp: Number(timestamp),
+        message: "On-chain registration verified.",
+      });
+    } catch (e) {
+      console.error("On-chain verification error:", e);
+      registerStatus.textContent = "On-chain verification failed";
+      updateRegisterReceipt({ message: "Failed to verify on-chain. See console." });
     }
   });
 }
@@ -1262,6 +1362,16 @@ function initVerifyFunctionality() {
         registerStatus.textContent = "Not registered";
       }
 
+      // Enable the on-chain verification button when watermark is found
+      if (verifyOnchainBtn) {
+        verifyOnchainBtn.disabled = !watermarkFound;
+      }
+
+      // Clear receipt UI when a new file is selected
+      if (registerReceipt) {
+        registerReceipt.innerHTML = "";
+      }
+
       // Brief accent animation on bars to emphasize result
       vfBars.classList.add("flash");
       setTimeout(() => vfBars.classList.remove("flash"), 400);
@@ -1339,9 +1449,6 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-
-// Call the function to initialize verify functionality
-initVerifyFunctionality();
 
 // =============================
 // Strip Metadata section logic
