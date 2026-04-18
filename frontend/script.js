@@ -1045,6 +1045,44 @@ function updateRegisterReceipt({ txHash, owner, timestamp, message }) {
   registerReceipt.innerHTML = pieces.join("\n");
 }
 
+function getRegisterErrorMessage(error) {
+  const candidates = [
+    error?.reason,
+    error?.data?.message,
+    error?.error?.message,
+    error?.message,
+  ].filter(Boolean);
+
+  for (const raw of candidates) {
+    const msg = String(raw);
+    if (msg.includes("Already registered")) {
+      return "This watermark is already registered on-chain";
+    }
+    if (msg.includes("cannot estimate gas")) {
+      return "Transaction would fail. Check the wallet network or whether this watermark is already registered.";
+    }
+    if (msg.includes("execution reverted")) {
+      return msg.replace(/^.*execution reverted:?\s*/i, "").trim() || "Transaction reverted on-chain";
+    }
+  }
+
+  return "Registration failed";
+}
+
+async function lookupOnchainRegistration(contract, uuidHash) {
+  const [owner, timestamp] = await contract.getOwner(uuidHash);
+  const zero = "0x0000000000000000000000000000000000000000";
+
+  if (!owner || owner === zero) {
+    return null;
+  }
+
+  return {
+    owner,
+    timestamp: Number(timestamp),
+  };
+}
+
 // =============================
 // MetaMask Event Listeners
 // Listen for account/chain changes
@@ -1155,12 +1193,36 @@ if (registerBtn) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(registryAddress, registryAbi, signer);
+      const network = await provider.getNetwork();
+      const contractCode = await provider.getCode(registryAddress);
 
       // keccak256 of the extracted text (utf8)
       const uuidHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(lastExtractedText));
       console.log("UUID:", lastExtractedText, "Hash:", uuidHash);
 
       registerStatus.textContent = "Sending transaction…";
+      if (!contractCode || contractCode === "0x") {
+        const msg = `No registry contract found at ${registryAddress} on chain ${network.chainId}`;
+        registerStatus.textContent = "Registry contract not found on current network";
+        updateRegisterReceipt({ message: msg });
+        console.error(msg);
+        return;
+      }
+
+      const existingRecord = await lookupOnchainRegistration(contract, uuidHash);
+      if (existingRecord) {
+        registerStatus.textContent = "Already registered on-chain";
+        updateRegisterReceipt({
+          owner: existingRecord.owner,
+          timestamp: existingRecord.timestamp,
+          message: "This watermark is already registered on-chain.",
+        });
+        if (verifyOnchainBtn) {
+          verifyOnchainBtn.disabled = false;
+        }
+        return;
+      }
+
       const tx = await contract.register(uuidHash);
       console.log("Transaction sent:", tx.hash);
       registerStatus.textContent = `Pending tx ${tx.hash.slice(0, 10)}…`;
@@ -1182,8 +1244,9 @@ if (registerBtn) {
       }
     } catch (e) {
       console.error("Register error:", e);
-      registerStatus.textContent = e && e.message ? e.message.substring(0, 60) : "Registration failed";
-      updateRegisterReceipt({ message: "Registration failed. Check console for details." });
+      const errorMessage = getRegisterErrorMessage(e);
+      registerStatus.textContent = errorMessage;
+      updateRegisterReceipt({ message: errorMessage });
     } finally {
       registerBtn.disabled = false;
     }
@@ -1217,10 +1280,9 @@ if (verifyOnchainBtn) {
       const contract = new ethers.Contract(registryAddress, registryAbi, provider);
       const uuidHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(lastExtractedText));
 
-      const [owner, timestamp] = await contract.getOwner(uuidHash);
-      const zero = "0x0000000000000000000000000000000000000000";
+      const existingRecord = await lookupOnchainRegistration(contract, uuidHash);
 
-      if (!owner || owner === zero) {
+      if (!existingRecord) {
         registerStatus.textContent = "Not registered on-chain";
         updateRegisterReceipt({ message: "No on-chain record found for this watermark." });
         return;
@@ -1228,8 +1290,8 @@ if (verifyOnchainBtn) {
 
       registerStatus.textContent = "✅ Registered on-chain";
       updateRegisterReceipt({
-        owner,
-        timestamp: Number(timestamp),
+        owner: existingRecord.owner,
+        timestamp: existingRecord.timestamp,
         message: "On-chain registration verified.",
       });
     } catch (e) {
