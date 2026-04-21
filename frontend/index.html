@@ -6,6 +6,7 @@
   <title>Invisible Watermarks. Visible Ownership. | PNGProtect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="crazy-hero.css" />
 </head>
 
 <body>
@@ -24,6 +25,7 @@
       <a href="watermark.html">Watermark</a>
       <a href="ai-shield.html">AI Shield</a>
       <a href="ai-vision.html">AI Vision</a>
+      <a href="trap.html">AI Trap</a>
       <a href="verify.html">Verify</a>
       <a href="detect.html">Detect Tampering</a>
       <a href="cleanup.html">Clean</a>
@@ -38,116 +40,275 @@
   </header>
 
   <main>
-    <!-- HERO SECTION -->
-    <section id="hero" class="hero section">
-      <div class="hero-content glass">
-        <h1 class="hero-title">Invisible Watermarks. Visible Ownership.</h1>
-        <p class="hero-subtitle">
-          Embed hidden ownership data into your images without changing how they look to the human eye. Protect against
-          AI scraping and theft.
-        <div class="hero-actions">
-          <a href="watermark.html" class="btn primary">
-            Watermark Image
-          </a>
-          <a href="ai-shield.html" class="btn secondary"
-            style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); text-decoration: none;">
-            AI Shield
-          </a>
-          <a href="verify.html" class="btn ghost" style="text-decoration: none;">
-            Verify Ownership
-          </a>
+    <!-- HERO SECTION WITH CRAZY VISUALS -->
+    <section id="hero" class="hero section hero-enhanced">
+      <!-- Animated Background Elements -->
+      <div class="hero-bg-elements">
+        <!-- Rotating Rings -->
+        <div class="ring-container">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="ring ring-3"></div>
         </div>
-        <div class="hero-meta">
-          <span class="pill">Client-side demo only</span>
-          <span class="pill">Invisible watermarking concept</span>
+
+        <!-- Pulsing Particles -->
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+
+        <!-- Pulsing Dots -->
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
+
+        <!-- Animated Lines -->
+        <div class="line line-1"></div>
+        <div class="line line-2"></div>
+
+        <!-- Morphing Blob SVG -->
+        <div class="blob-container">
+          <svg class="blob-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="blob-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color: rgba(59, 130, 246, 0.8); stop-opacity: 1;" />
+                <stop offset="50%" style="stop-color: rgba(168, 85, 247, 0.5); stop-opacity: 1;" />
+                <stop offset="100%" style="stop-color: rgba(34, 197, 94, 0.4); stop-opacity: 1;" />
+              </linearGradient>
+            </defs>
+            <path d="M 100,100 Q 80,40 100,20 Q 120,30 140,20 Q 160,40 160,100 Q 160,160 140,180 Q 120,170 100,180 Q 80,170 60,180 Q 40,160 40,100 Q 40,40 60,20 Z" fill="url(#blob-gradient)" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="hero-wrapper">
+        <div class="hero-content glass">
+          <h1 class="hero-title">Invisible Watermarks.<br>Visible Ownership.</h1>
+          <p class="hero-subtitle">
+            Embed hidden ownership data into your images without changing how they look to the human eye. Protect against
+            AI scraping and theft with cutting-edge steganography and adversarial techniques.
+          </p>
+          <div class="hero-actions">
+            <a href="watermark.html" class="btn primary btn-glow">
+              <span class="btn-content">⚲ Start Watermarking</span>
+            </a>
+            <a href="ai-shield.html" class="btn secondary"
+              style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); text-decoration: none;">
+              🛡️ AI Shield
+            </a>
+            <a href="verify.html" class="btn ghost" style="text-decoration: none;">
+              🔍 Verify Ownership
+            </a>
+          </div>
+          <div class="hero-meta">
+            <span class="pill">✓ Client-side only</span>
+            <span class="pill">✓ Open Source</span>
+            <span class="pill">✓ Production Ready</span>
+          </div>
+        </div>
+
+        <!-- Crazy Showcase Card -->
+        <div class="hero-showcase glass">
+          <div class="showcase-inner">
+            <div class="showcase-header">
+              <h3>One-Click Protection</h3>
+              <span class="badge">⚡ Instant</span>
+            </div>
+            <div class="feature-preview">
+              <div class="preview-item">
+                <div class="preview-icon">🖼️</div>
+                <div class="preview-text">
+                  <span class="preview-label">Upload</span>
+                  <span class="preview-value">Any Image</span>
+                </div>
+              </div>
+              <div class="preview-arrow">→</div>
+              <div class="preview-item">
+                <div class="preview-icon">⚙️</div>
+                <div class="preview-text">
+                  <span class="preview-label">Process</span>
+                  <span class="preview-value">Embed Data</span>
+                </div>
+              </div>
+              <div class="preview-arrow">→</div>
+              <div class="preview-item">
+                <div class="preview-icon">✓</div>
+                <div class="preview-text">
+                  <span class="preview-label">Protected</span>
+                  <span class="preview-value">Download</span>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-stats">
+              <div class="stat-mini">
+                <span class="stat-value quick-count" data-target="99">0</span><span>%</span>
+                <span class="stat-label">Invisible</span>
+              </div>
+              <div class="stat-mini">
+                <span class="stat-value quick-count" data-target="100">0</span><span>%</span>
+                <span class="stat-label">Recovery</span>
+              </div>
+              <div class="stat-mini">
+                <span class="stat-value quick-count" data-target="256">0</span><span>-bit</span>
+                <span class="stat-label">Data</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- FEATURES OVERVIEW GRID -->
-    <section id="features" class="section">
+    <!-- STATS SECTION - Removed for clean design -->
+
+    <!-- FEATURES OVERVIEW GRID - ENHANCED WITH 3D -->
+    <section id="features" class="section features-enhanced">
       <div class="section-header">
-        <h2>Platform Features</h2>
-        <p>Everything you need for robust, invisible ownership signals and content protection.</p>
+        <h2>Complete Protection Stack</h2>
+        <p>Six powerful protection layers, all working in perfect harmony.</p>
       </div>
 
-      <div class="features-grid">
-        <a href="watermark.html" class="glass feature-card"
-          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
-          <div class="feature-icon">☑️</div>
+      <div class="features-grid features-grid-3d">
+        <a href="watermark.html" class="glass feature-card feature-card-3d feature-1"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-1"></div>
+          <div class="feature-icon-lg">☑️</div>
           <h3>Invisible Watermarking</h3>
           <p>
-            Embed hidden ownership identifiers into images using LSB steganography.
+            Embed hidden ownership identifiers using LSB steganography. Survives compression and basic edits.
           </p>
+          <div class="feature-badge badge-blue">LSB Steganography</div>
         </a>
 
-        <a href="ai-shield.html" class="glass feature-card"
-          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
-          <div class="feature-icon">🛡️</div>
+        <a href="ai-shield.html" class="glass feature-card feature-card-3d feature-2"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-2"></div>
+          <div class="feature-icon-lg">🛡️</div>
           <h3>AI Shield Protection</h3>
           <p>
-            Add invisible noise to disrupt AI scrapers and unauthorized model training.
+            Add invisible perturbations to disrupt AI scrapers and unauthorized model training at scale.
           </p>
+          <div class="feature-badge badge-purple">Adversarial Noise</div>
         </a>
 
-        <a href="verify.html" class="glass feature-card"
-          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
-          <div class="feature-icon">🔍</div>
+        <a href="trap.html" class="glass feature-card feature-card-3d feature-3"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-3"></div>
+          <div class="feature-icon-lg">⚡</div>
+          <h3>AI Trap: Data Poisoning</h3>
+          <p>
+            Generate poisoned variants to actively degrade training datasets. Damage by design.
+          </p>
+          <div class="feature-badge badge-cyan">FGSM Algorithm</div>
+        </a>
+
+        <a href="verify.html" class="glass feature-card feature-card-3d feature-4"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-4"></div>
+          <div class="feature-icon-lg">🔍</div>
           <h3>Verify Ownership</h3>
           <p>
-            Instantly verify watermarks and recover owner IDs from any image file.
+            Instantly verify watermarks and recover hidden owner IDs from any protected image worldwide.
           </p>
+          <div class="feature-badge badge-green">Instant Detection</div>
         </a>
 
-        <a href="detect.html" class="glass feature-card"
-          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
-          <div class="feature-icon">🔬</div>
+        <a href="detect.html" class="glass feature-card feature-card-3d feature-5"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-5"></div>
+          <div class="feature-icon-lg">🔬</div>
           <h3>Tamper Detection</h3>
           <p>
-            Analyze if an image has been manipulated or if a watermark has been removed.
+            Analyze if an image has been manipulated, cropped, or if watermarks have been removed.
           </p>
+          <div class="feature-badge badge-orange">Forensic Analysis</div>
         </a>
 
-        <a href="cleanup.html" class="glass feature-card"
-          style="text-decoration: none; color: inherit; transition: transform 0.2s;">
-          <div class="feature-icon">🧹</div>
+        <a href="cleanup.html" class="glass feature-card feature-card-3d feature-6"
+          style="text-decoration: none; color: inherit;">
+          <div class="card-bg-gradient gradient-6"></div>
+          <div class="feature-icon-lg">🧹</div>
           <h3>Metadata Stripping</h3>
           <p>
-            Remove EXIF, GPS, and device data for privacy before sharing.
+            Remove EXIF, GPS, and device data for privacy. Share anonymously without tracking.
           </p>
+          <div class="feature-badge badge-red">Privacy Shield</div>
         </a>
+      </div>
+    </section>
 
-        <div class="glass feature-card">
-          <div class="feature-icon">🌐</div>
-          <h3>Blockchain Registry</h3>
-          <p>
-            (Coming Soon) Register ownership claims on Ethereum for immutable proof.
-          </p>
+    <!-- HOW IT WORKS - ENHANCED WITH VISUAL FLOW -->
+    <section id="how-it-works" class="section how-it-works-enhanced">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>A sophisticated yet simple workflow. Three steps to complete image protection.</p>
+      </div>
+      <div class="steps-grid steps-grid-flow">
+        <div class="glass step-card step-card-3d">
+          <div class="step-number glow-text">01</div>
+          <h3>🖼️ Select & Configure</h3>
+          <p>Upload your image and choose your protection method—Watermarking for ownership, Shield for training disruption, or Trap for active poisoning.</p>
+          <div class="step-divider"></div>
+        </div>
+        <div class="glass step-card step-card-3d">
+          <div class="step-number glow-text">02</div>
+          <h3>⚡ Embed & Process</h3>
+          <p>Revolutionary algorithms embed invisible data or adversarial patterns directly into pixel values. No detectable changes to image quality.</p>
+          <div class="step-divider"></div>
+        </div>
+        <div class="glass step-card step-card-3d">
+          <div class="step-number glow-text">03</div>
+          <h3>✓ Deploy & Verify</h3>
+          <p>Share your protected images freely. Anyone can verify ownership or detect tampering instantly using our public verification tools.</p>
         </div>
       </div>
     </section>
 
-    <!-- HOW IT WORKS -->
-    <section id="how-it-works" class="section">
-      <div class="section-header">
-        <h2>How it Works</h2>
-        <p>A sophisticated yet simple flow designed for creators, platforms, and teams.</p>
+    <!-- CALL TO ACTION SECTION -->
+    <section id="capabilities" class="section capabilities-section">
+      <div class="capabilities-grid">
+        <div class="capability-item glass">
+          <div class="capability-icon">🎯</div>
+          <h3>Precision Protection</h3>
+          <p>Control exactly how much data you embed or how strong your adversarial perturbations are.</p>
+        </div>
+        <div class="capability-item glass">
+          <div class="capability-icon">🌍</div>
+          <h3>Universal Compatibility</h3>
+          <p>Works with PNG, JPEG, WebP. Protected images remain fully functional across all platforms.</p>
+        </div>
+        <div class="capability-item glass">
+          <div class="capability-icon">⚙️</div>
+          <h3>Browser-Based</h3>
+          <p>No server uploads, no waiting. Entire processing happens in your browser instantly.</p>
+        </div>
+        <div class="capability-item glass">
+          <div class="capability-icon">🔬</div>
+          <h3>Research Grade</h3>
+          <p>Built on peer-reviewed steganography and adversarial ML techniques. Not snake oil.</p>
+        </div>
       </div>
-      <div class="steps-grid">
-        <div class="glass step-card">
-          <div class="step-number">01</div>
-          <h3>Select & Configure</h3>
-          <p>Upload your image and choose your protection method (Watermark or AI Shield).</p>
+    </section>
+
+    <!-- FEATURED SHOWCASE -->
+    <section class="showcase-section section">
+      <div class="showcase-content glass">
+        <div class="showcase-text">
+          <h2>Why PNGProtect?</h2>
+          <p>In an era where your images are constantly scraped, indexed, and used to train AI models without consent, protection isn't optional—it's essential.</p>
+          <ul class="feature-list">
+            <li><strong>Proof of Ownership:</strong> Watermarks prove you created or own this content.</li>
+            <li><strong>Training Immunity:</strong> Poisoned variants damage any model trained on mixed data.</li>
+            <li><strong>Tamper Detection:</strong> Know instantly if someone modified your work.</li>
+            <li><strong>Privacy First:</strong> Strip all metadata before sharing.</li>
+          </ul>
+          <a href="watermark.html" class="btn primary btn-glow" style="margin-top: 20px;">
+            Start Protecting →
+          </a>
         </div>
-        <div class="glass step-card">
-          <div class="step-number">02</div>
-          <h3>Embed & Protect</h3>
-          <p>Algorithms embed invisible data or adversarial noise into the pixel values.</p>
-        </div>
-        <div class="glass step-card">
-          <div class="step-number">03</div>
-          <h3>Verify Anywhere</h3>
-          <p>Anyone can use the public verification tools to check ownership and integrity.</p>
+        <div class="showcase-visual">
+          <div class="visual-box box-1"></div>
+          <div class="visual-box box-2"></div>
+          <div class="visual-box box-3"></div>
         </div>
       </div>
     </section>
@@ -171,6 +332,66 @@
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="script.js"></script>
+
+  <!-- Counter Animation Script -->
+  <script>
+    // Animate counters when they come into view
+    function animateCounters() {
+      const counters = document.querySelectorAll('.counter');
+      const quickCounts = document.querySelectorAll('.quick-count');
+      
+      const allElements = [...counters, ...quickCounts];
+      
+      allElements.forEach(el => {
+        if (el.dataset.target && !el.dataset.animated) {
+          const target = parseInt(el.dataset.target);
+          const duration = 1500; // milliseconds
+          const startTime = Date.now();
+          
+          const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Easing function: easeOutQuad
+            const eased = 1 - Math.pow(1 - progress, 2);
+            const current = Math.floor(eased * target);
+            
+            el.textContent = current;
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              el.dataset.animated = 'true';
+            }
+          };
+          
+          animate();
+        }
+      });
+    }
+
+    // Trigger animations when stats section comes into view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounters();
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      observer.observe(statsSection);
+    }
+
+    // Also animate on page load if stats section is already visible
+    window.addEventListener('load', () => {
+      if (statsSection && statsSection.getBoundingClientRect().top < window.innerHeight) {
+        animateCounters();
+      }
+    });
+  </script>
 </body>
 
 </html>

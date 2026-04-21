@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Trap | PNGProtect - Data Poisoning Defense</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <!-- Animated gradient + particles background -->
+    <div class="bg-gradient"></div>
+    <canvas id="bg-particles"></canvas>
+
+    <!-- Top navigation -->
+    <header class="top-nav">
+        <div class="logo">
+            <span class="logo-dot"></span>
+            <a href="index.html" style="text-decoration: none; color: inherit;"><span>PNGProtect</span></a>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="watermark.html">Watermark</a>
+            <a href="ai-shield.html">AI Shield</a>
+            <a href="ai-vision.html">AI Vision</a>
+            <a href="trap.html" class="active">AI Trap</a>
+            <a href="verify.html">Verify</a>
+            <a href="detect.html">Detect Tampering</a>
+            <a href="cleanup.html">Clean</a>
+        </nav>
+        <div class="user-area">
+            <button id="connect-wallet-btn" class="btn ghost">Connect Wallet</button>
+            <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
+            <span id="wallet-address" class="wallet-address">Not connected</span>
+            <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
+                title="Toggle light/dark mode">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- AI TRAP SECTION -->
+        <section id="ai-trap" class="section" style="padding-top: 80px;">
+            <div class="section-header">
+                <h2>AI Trap: Data Poisoning Defense</h2>
+                <p>Generate poisoned image variants to degrade unauthorized AI model training.</p>
+            </div>
+
+            <div class="layout-grid">
+                <!-- Upload + controls -->
+                <div class="glass card">
+                    <h3>Generate Trap Package</h3>
+
+                    <div id="trap-dropzone" class="dropzone">
+                        <input type="file" id="trap-input" accept="image/*" hidden />
+                        <div class="dropzone-inner">
+                            <span class="drop-icon">⚡</span>
+                            <p>Drag & drop image to poison</p>
+                            <p class="drop-subtext">or click to browse</p>
+                        </div>
+                    </div>
+
+                    <!-- Variants Slider -->
+                    <label class="field">
+                        <div class="field-row">
+                            <span class="field-label">Number of Variants</span>
+                            <span id="trap-variants-label" class="field-label-soft">20</span>
+                        </div>
+                        <input type="range" id="trap-variants" min="20" max="100" value="20" step="5" />
+                        <div class="field-scale">
+                            <span>20 (Quick)</span>
+                            <span>100 (Thorough)</span>
+                        </div>
+                    </label>
+
+                    <!-- Intensity Slider -->
+                    <label class="field">
+                        <div class="field-row">
+                            <span class="field-label">Poison Intensity</span>
+                            <span id="trap-intensity-label" class="field-label-soft">50 (Balanced)</span>
+                        </div>
+                        <input type="range" id="trap-intensity" min="1" max="100" value="50" />
+                        <div class="field-scale">
+                            <span>Subtle (1)</span>
+                            <span>Aggressive (100)</span>
+                        </div>
+                    </label>
+
+                    <!-- Output Format -->
+                    <label class="field">
+                        <span class="field-label">Output Format</span>
+                        <div class="format-buttons">
+                            <button type="button" class="format-btn active" data-format="json">
+                                📋 JSON (Download)
+                            </button>
+                            <button type="button" class="format-btn" data-format="zip">
+                                📦 ZIP (Package)
+                            </button>
+                        </div>
+                    </label>
+
+                    <button id="trap-btn" class="btn primary full">
+                        <span class="btn-label">Generate Trap Package</span>
+                        <span class="btn-spinner"></span>
+                    </button>
+
+                    <p class="hint">
+                        If attacker scrapes these variants + trains a model, their model performance degrades.
+                    </p>
+                </div>
+
+                <!-- Result card -->
+                <div class="glass card result-card">
+                    <h3>Trap Results</h3>
+
+                    <div id="trap-status" class="status-pill status-idle">
+                        Ready to generate...
+                    </div>
+
+                    <!-- Poison Score Display -->
+                    <div class="metrics-grid" style="margin: 1.5rem 0;">
+                        <div class="metric-item">
+                            <span class="metric-label">Poison Strength</span>
+                            <div class="metric-display">
+                                <span id="trap-score" class="metric-value">–</span>
+                                <div id="trap-score-bar" class="metric-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Embedding Drift</span>
+                            <span id="trap-drift" class="metric-value">–</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Confidence Drop</span>
+                            <span id="trap-conf" class="metric-value">–</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Variants Generated</span>
+                            <span id="trap-variant-count" class="metric-value">–</span>
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="preview-wrapper"
+                        style="margin: 1rem 0; min-height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <img id="trap-preview" class="preview-image"
+                            style="display: none; max-width: 100%; max-height: 300px;" />
+                        <div id="trap-placeholder" style="color: var(--text-soft); font-size: 0.9rem;">
+                            Preview will appear here
+                        </div>
+                    </div>
+
+                    <!-- Download Buttons -->
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="trap-download-btn" class="btn primary full" disabled>
+                            ⬇️ Download Package
+                        </button>
+                        <button id="trap-analyze-btn" class="btn secondary" disabled>
+                            🔍 Quick Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAILED INFO SECTION -->
+        <section class="section">
+            <div class="glass card" style="max-width: 1000px; margin: 0 auto;">
+                <h3>📚 Understanding AI Trap</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--primary-color);">The Challenge: Dataset Poisoning</h4>
+                        <p>Even with AI Shield on individual images, attackers can scrape thousands of images and train
+                            models on them. Your single protected image becomes one of millions in their dataset.</p>
+
+                        <p><strong>AI Trap</strong> solves this by generating <strong>multiple poisoned variants</strong>
+                            of your image. If attackers scrape these variants along with your original image, they're
+                            injecting poison into their entire training dataset.</p>
+
+                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">How It Works</h4>
+                        <ol style="line-height: 1.8; padding-left: 1.5rem;">
+                            <li><strong>Generate Variants:</strong> Create 20-100 adversarial copies of your image</li>
+                            <li><strong>Add Triggers:</strong> Inject imperceptible frequency-domain patterns</li>
+                            <li><strong>Measure Drift:</strong> Track how far each variant's embedding drifts from
+                                original</li>
+                            <li><strong>Package:</strong> Export as JSON or downloadable ZIP</li>
+                            <li><strong>Deploy:</strong> Distribute alongside your original image</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--primary-color);">Poison Strength Score</h4>
+                        <p>Our scoring algorithm combines three metrics:</p>
+                        <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
+                            <li style="margin-bottom: 1rem;">
+                                <span style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: 600;">40%</span>
+                                <strong>Embedding Drift:</strong> How far poisoned representation diverges from
+                                original
+                            </li>
+                            <li style="margin-bottom: 1rem;">
+                                <span style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: 600;">50%</span>
+                                <strong>Confidence Drop:</strong> How confused the model becomes
+                            </li>
+                            <li style="margin-bottom: 1rem;">
+                                <span style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: 600;">10%</span>
+                                <strong>Consistency:</strong> Uniformity across variants
+                            </li>
+                        </ul>
+
+                        <h4 style="color: var(--primary-color); margin-top: 1.5rem;">Intensity Levels</h4>
+                        <ul style="list-style-type: none; padding-left: 0; line-height: 1.8;">
+                            <li>
+                                <strong>1-25:</strong> Subtle attack (imperceptible)
+                            </li>
+                            <li>
+                                <strong>26-75:</strong> Balanced attack (recommended)
+                            </li>
+                            <li>
+                                <strong>76-100:</strong> Aggressive attack (maximum damage)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="color: var(--primary-color);">Use Cases</h4>
+                    <p style="line-height: 1.8;">
+                        <strong>🎨 Artists:</strong> Protect your style from being scraped by generative AI<br>
+                        <strong>📸 Photographers:</strong> Poison unauthorized training datasets<br>
+                        <strong>🏢 Enterprises:</strong> Defend proprietary image datasets<br>
+                        <strong>🔒 Security:</strong> Create honeypot images designed to degrade adversary models
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="trap.js"></script>
+</body>
+
+</html>

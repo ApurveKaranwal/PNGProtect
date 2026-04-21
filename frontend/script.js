@@ -547,9 +547,24 @@ function initWatermarkFunctionality() {
           try {
             const errorText = await embedResponse.text();
             console.error("Backend error response:", errorText);
-            throw new Error(`Backend error: ${errorText}`);
-          } catch (e) {
+            
+            // Try to parse as JSON and extract detail message
+            try {
+              const errorJson = JSON.parse(errorText);
+              if (errorJson.detail) {
+                throw new Error(errorJson.detail);
+              }
+            } catch (parseError) {
+              // If not JSON or no detail field, use raw text
+              if (errorText) {
+                throw new Error(errorText);
+              }
+            }
+            
+            // Fallback: show status code if we couldn't parse anything useful
             throw new Error(`Backend returned status ${embedResponse.status}`);
+          } catch (e) {
+            throw e;
           }
         }
 
