@@ -11,11 +11,11 @@ import base64
 class AIVisionAnalyzer:
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Loading ResNet50 on {self.device}...")
+        print(f"Loading MobileNetV3 on {self.device}...")
         
-        # Load ResNet50 with ImageNet weights
-        weights = models.ResNet50_Weights.IMAGENET1K_V1
-        self.model = models.resnet50(weights=weights)
+        # Load MobileNetV3 with ImageNet weights
+        weights = models.MobileNet_V3_Small_Weights.IMAGENET1K_V1
+        self.model = models.mobilenet_v3_small(weights=weights)
         self.model.to(self.device)
         self.model.eval()
         
@@ -186,7 +186,7 @@ class AIVisionAnalyzer:
         protected_b64 = base64.b64encode(prot_buffer.getvalue()).decode('utf-8')
 
         return {
-            "model": "ResNet50",
+            "model": "MobileNetV3",
             "original_prediction": args_to_dict(orig_pred),
             "protected_prediction": args_to_dict(prot_pred),
             "confusion_score": round(confusion_score, 4),

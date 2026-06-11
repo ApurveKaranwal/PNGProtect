@@ -40,17 +40,17 @@ class AdversarialTrapGenerator:
         """Initialize the trap generator with a pretrained model for embedding analysis."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
-        # Load ResNet50 for embedding analysis (more capacity than ResNet18)
-        self.model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
+        # Load MobileNetV3 for embedding analysis (more capacity than MobileNetV3)
+        self.model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1)
         self.model.to(self.device)
         self.model.eval()
         
         # Remove classification head, keep features
-        self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
+        self.feature_extractor = nn.Sequential(self.model.features, self.model.avgpool)
         self.feature_extractor.eval()
         
         # Classification head for analysis
-        self.classifier = self.model.fc
+        self.classifier = self.model.classifier
         
         # Standard ImageNet preprocessing
         self.mean = [0.485, 0.456, 0.406]
@@ -95,7 +95,7 @@ class AdversarialTrapGenerator:
         
         # Forward pass
         features = self.feature_extractor(image_tensor_copy)
-        features_flat = features.squeeze(-1).squeeze(-1)  # Flatten spatial dims
+        features_flat = torch.flatten(features, 1)  # Flatten spatial dims
         output = self.classifier(features_flat)
         
         # Compute loss
@@ -179,8 +179,8 @@ class AdversarialTrapGenerator:
             orig_features = self.feature_extractor(original_tensor)
             pert_features = self.feature_extractor(perturbed_tensor)
             
-            orig_emb = orig_features.squeeze(-1).squeeze(-1)
-            pert_emb = pert_features.squeeze(-1).squeeze(-1)
+            orig_emb = orig_torch.flatten(features, 1)
+            pert_emb = pert_torch.flatten(features, 1)
             
             # Cosine distance
             cos_sim = F.cosine_similarity(orig_emb, pert_emb, dim=1)

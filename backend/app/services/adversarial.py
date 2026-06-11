@@ -9,14 +9,14 @@ import copy
 
 class AdversarialProtector:
     def __init__(self):
-        # Initialize with a pre-trained ResNet18 model
+        # Initialize with a pre-trained MobileNetV3 model
         # strict=False allows loading even if some minor version differences exist, 
         # but for standard torchvision models it's usually fine.
         # We use CPU by default to ensure compatibility, can be moved to CUDA if available.
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
-        # Load a lightweight robust model (ResNet18) in eval mode
-        self.model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+        # Load a lightweight robust model (MobileNetV3) in eval mode
+        self.model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1)
         self.model.to(self.device)
         self.model.eval()
         
