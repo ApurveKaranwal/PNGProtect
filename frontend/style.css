@@ -1915,3 +1915,111 @@ body.light-mode .format-btn.active {
   border-color: rgba(59, 130, 246, 0.5) !important;
 }
 }
+
+/* ===========================
+   RESPONSIVE DESIGN (MOBILE & TABLET)
+   =========================== */
+
+@media screen and (max-width: 1024px) {
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+  .layout-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .showcase-visual {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-radius: 16px;
+    top: 10px;
+    inset-inline: 10px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .nav-links a {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  .user-area {
+    gap: 8px;
+  }
+  
+  #wallet-address {
+    display: none; /* Hide wallet address text on small screens to save space */
+  }
+
+  .hero {
+    padding-top: 180px;
+    padding-bottom: 60px;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .section {
+    padding: 60px 20px 40px;
+  }
+
+  .features-grid, .steps-grid, .capabilities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tech-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .logo span {
+    font-size: 1.4rem;
+  }
+  
+  .user-area .btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
