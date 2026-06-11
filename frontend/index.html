@@ -42,43 +42,9 @@
   <main>
     <!-- HERO SECTION WITH CRAZY VISUALS -->
     <section id="hero" class="hero section hero-enhanced">
-      <!-- Animated Background Elements -->
+      <!-- Animated 3D Background Elements -->
       <div class="hero-bg-elements">
-        <!-- Rotating Rings -->
-        <div class="ring-container">
-          <div class="ring ring-1"></div>
-          <div class="ring ring-2"></div>
-          <div class="ring ring-3"></div>
-        </div>
-
-        <!-- Pulsing Particles -->
-        <div class="particle particle-1"></div>
-        <div class="particle particle-2"></div>
-        <div class="particle particle-3"></div>
-        <div class="particle particle-4"></div>
-
-        <!-- Pulsing Dots -->
-        <div class="dot dot-1"></div>
-        <div class="dot dot-2"></div>
-        <div class="dot dot-3"></div>
-
-        <!-- Animated Lines -->
-        <div class="line line-1"></div>
-        <div class="line line-2"></div>
-
-        <!-- Morphing Blob SVG -->
-        <div class="blob-container">
-          <svg class="blob-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="blob-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color: rgba(59, 130, 246, 0.8); stop-opacity: 1;" />
-                <stop offset="50%" style="stop-color: rgba(168, 85, 247, 0.5); stop-opacity: 1;" />
-                <stop offset="100%" style="stop-color: rgba(34, 197, 94, 0.4); stop-opacity: 1;" />
-              </linearGradient>
-            </defs>
-            <path d="M 100,100 Q 80,40 100,20 Q 120,30 140,20 Q 160,40 160,100 Q 160,160 140,180 Q 120,170 100,180 Q 80,170 60,180 Q 40,160 40,100 Q 40,40 60,20 Z" fill="url(#blob-gradient)" />
-          </svg>
-        </div>
+        <canvas id="hero-3d-canvas"></canvas>
       </div>
 
       <div class="hero-wrapper">
@@ -116,7 +82,9 @@
             </div>
             <div class="feature-preview">
               <div class="preview-item">
-                <div class="preview-icon">🖼️</div>
+                <div class="preview-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6; filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8));"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                </div>
                 <div class="preview-text">
                   <span class="preview-label">Upload</span>
                   <span class="preview-value">Any Image</span>
@@ -124,7 +92,9 @@
               </div>
               <div class="preview-arrow">→</div>
               <div class="preview-item">
-                <div class="preview-icon">⚙️</div>
+                <div class="preview-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #a855f7; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.8));"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
                 <div class="preview-text">
                   <span class="preview-label">Process</span>
                   <span class="preview-value">Embed Data</span>
@@ -132,7 +102,9 @@
               </div>
               <div class="preview-arrow">→</div>
               <div class="preview-item">
-                <div class="preview-icon">✓</div>
+                <div class="preview-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e; filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.8));"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                </div>
                 <div class="preview-text">
                   <span class="preview-label">Protected</span>
                   <span class="preview-value">Download</span>
@@ -331,6 +303,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="3d-hero.js"></script>
   <script src="script.js"></script>
 
   <!-- Counter Animation Script -->

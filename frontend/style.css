@@ -278,7 +278,7 @@ body.light-mode .glass {
 
 .top-nav {
   position: fixed;
-  inset-inline: min(6vw, 72px);
+  inset-inline: 20px;
   top: 18px;
   z-index: 20;
   display: grid;
@@ -347,14 +347,14 @@ body.light-mode .logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-size: 0.85rem;
+  gap: 4px;
+  font-size: 0.75rem;
   width: 100%;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .nav-links a {
-  padding: 8px 16px;
+  padding: 4px 8px;
   border-radius: 999px;
   color: var(--text-soft);
   transition: all 0.2s ease;
