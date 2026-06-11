@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Background shield gradient -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#4F46E5" />
+    </linearGradient>
+    
+    <!-- Image icon gradient -->
+    <linearGradient id="picGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+
+    <!-- Glowing dot gradient -->
+    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Glowing Drop Shadow -->
+  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="15" result="blur" />
+    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+  </filter>
+
+  <!-- Base Shield Shape -->
+  <path fill="url(#shieldGrad)" d="M256,24 L464,88 L464,240 C464,384 376,488 256,504 C136,488 48,384 48,240 L48,88 L256,24 Z" filter="url(#glow)"/>
+  
+  <!-- Stylized inner polygon (adds depth to the shield) -->
+  <path fill="#FFFFFF" opacity="0.1" d="M256,24 L464,88 L464,240 C464,384 376,488 256,504 L256,24 Z" />
+
+  <!-- Inner rounded rectangle representing an image canvas -->
+  <rect x="136" y="168" width="240" height="176" rx="24" fill="#FFFFFF" opacity="0.95" />
+  
+  <!-- Image element: Sun -->
+  <circle cx="312" cy="224" r="24" fill="#FBBF24" />
+  
+  <!-- Image element: Mountains -->
+  <path fill="url(#picGrad)" d="M136,320 L208,224 L272,288 L336,192 L376,248 L376,320 C376,333.25 365.25,344 352,344 L160,344 C146.75,344 136,333.25 136,320 Z" />
+  
+  <!-- Scanning / Watermark grid lines overlay -->
+  <g opacity="0.2">
+    <line x1="136" y1="200" x2="376" y2="200" stroke="#4F46E5" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="136" y1="250" x2="376" y2="250" stroke="#4F46E5" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="136" y1="300" x2="376" y2="300" stroke="#4F46E5" stroke-width="2" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- The signature "Invisible Watermark" dot -->
+  <circle cx="256" cy="408" r="16" fill="url(#dotGrad)" />
+</svg>
