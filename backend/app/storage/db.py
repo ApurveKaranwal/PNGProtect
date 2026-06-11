@@ -2,15 +2,22 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 from typing import Optional
+import os
+import psycopg2
+from psycopg2 import pool
+from psycopg2.extras import DictCursor
 
-import sqlite3
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:password@localhost/pngprotect")
 
+# Global pool
+_pool = None
 
-import tempfile
-DB_PATH = Path(tempfile.gettempdir()) / "pngprotect_watermarks.db"
-
+def get_db_pool():
+    global _pool
+    if _pool is None:
+        _pool = psycopg2.pool.ThreadedConnectionPool(1, 20, DATABASE_URL)
+    return _pool
 
 @dataclass
 class WatermarkRecord:
@@ -24,39 +31,40 @@ class WatermarkRecord:
 
 class WatermarkStore:
     """
-    SQLite-backed storage for watermark metadata.
-    Persisted in watermarks.db, survives server restarts.
+    PostgreSQL-backed storage for watermark metadata.
     """
 
     _instance: "WatermarkStore | None" = None
 
     def __init__(self) -> None:
-        # Use check_same_thread=False so FastAPI threads can share the connection.
-        # For a real app, use a connection per request or a pool via SQLAlchemy. [web:117][web:121]
-        self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-        self.conn.row_factory = sqlite3.Row
+        self.pool = get_db_pool()
         self._ensure_schema()
 
     def _ensure_schema(self) -> None:
-        self.conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS watermarks (
-                watermark_id TEXT PRIMARY KEY,
-                image_hash   TEXT NOT NULL,
-                owner_id     TEXT NOT NULL,
-                strength     INTEGER NOT NULL,
-                total_bits   INTEGER NOT NULL,
-                created_at   TEXT NOT NULL
-            );
-            """
-        )
-        self.conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_watermarks_image_hash ON watermarks (image_hash);"
-        )
-        self.conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_watermarks_owner_id ON watermarks (owner_id);"
-        )
-        self.conn.commit()
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS watermarks (
+                        watermark_id TEXT PRIMARY KEY,
+                        image_hash   TEXT NOT NULL,
+                        owner_id     TEXT NOT NULL,
+                        strength     INTEGER NOT NULL,
+                        total_bits   INTEGER NOT NULL,
+                        created_at   TEXT NOT NULL
+                    );
+                    """
+                )
+                cur.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_watermarks_image_hash ON watermarks (image_hash);"
+                )
+                cur.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_watermarks_owner_id ON watermarks (owner_id);"
+                )
+            conn.commit()
+        finally:
+            self.pool.putconn(conn)
 
     @classmethod
     def get_instance(cls) -> "WatermarkStore":
@@ -75,17 +83,28 @@ class WatermarkStore:
         total_bits: int,
     ) -> None:
         created_at = datetime.utcnow().isoformat()
-        self.conn.execute(
-            """
-            INSERT OR REPLACE INTO watermarks
-            (watermark_id, image_hash, owner_id, strength, total_bits, created_at)
-            VALUES (?, ?, ?, ?, ?, ?);
-            """,
-            (watermark_id, image_hash, owner_id, strength, total_bits, created_at),
-        )
-        self.conn.commit()
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO watermarks
+                    (watermark_id, image_hash, owner_id, strength, total_bits, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (watermark_id) DO UPDATE SET
+                        image_hash = EXCLUDED.image_hash,
+                        owner_id = EXCLUDED.owner_id,
+                        strength = EXCLUDED.strength,
+                        total_bits = EXCLUDED.total_bits,
+                        created_at = EXCLUDED.created_at;
+                    """,
+                    (watermark_id, image_hash, owner_id, strength, total_bits, created_at),
+                )
+            conn.commit()
+        finally:
+            self.pool.putconn(conn)
 
-    def _row_to_record(self, row: sqlite3.Row | None) -> Optional[WatermarkRecord]:
+    def _row_to_record(self, row) -> Optional[WatermarkRecord]:
         if row is None:
             return None
         return WatermarkRecord(
@@ -98,18 +117,28 @@ class WatermarkStore:
         )
 
     def get_by_image_hash(self, image_hash: str) -> Optional[WatermarkRecord]:
-        cur = self.conn.execute(
-            "SELECT * FROM watermarks WHERE image_hash = ? LIMIT 1;", (image_hash,)
-        )
-        row = cur.fetchone()
-        return self._row_to_record(row)
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(
+                    "SELECT * FROM watermarks WHERE image_hash = %s LIMIT 1;", (image_hash,)
+                )
+                row = cur.fetchone()
+                return self._row_to_record(row)
+        finally:
+            self.pool.putconn(conn)
 
     def get_by_watermark_id(self, watermark_id: str) -> Optional[WatermarkRecord]:
-        cur = self.conn.execute(
-            "SELECT * FROM watermarks WHERE watermark_id = ? LIMIT 1;", (watermark_id,)
-        )
-        row = cur.fetchone()
-        return self._row_to_record(row)
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                cur.execute(
+                    "SELECT * FROM watermarks WHERE watermark_id = %s LIMIT 1;", (watermark_id,)
+                )
+                row = cur.fetchone()
+                return self._row_to_record(row)
+        finally:
+            self.pool.putconn(conn)
 
     def get_by_owner_and_hash_prefix(
         self, extracted_text: str, image_hash: str
@@ -119,22 +148,26 @@ class WatermarkStore:
         1. Try exact hash match and check owner_id vs extracted_text.
         2. Fallback: any row where owner_id LIKE '%%extracted_text%%'.
         """
+        conn = self.pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=DictCursor) as cur:
+                # 1) Exact hash match first
+                cur.execute(
+                    "SELECT * FROM watermarks WHERE image_hash = %s LIMIT 1;", (image_hash,)
+                )
+                row = cur.fetchone()
+                rec = self._row_to_record(row)
+                if rec:
+                    if rec.owner_id in extracted_text or extracted_text in rec.owner_id:
+                        return rec
 
-        # 1) Exact hash match first
-        cur = self.conn.execute(
-            "SELECT * FROM watermarks WHERE image_hash = ? LIMIT 1;", (image_hash,)
-        )
-        row = cur.fetchone()
-        rec = self._row_to_record(row)
-        if rec:
-            if rec.owner_id in extracted_text or extracted_text in rec.owner_id:
-                return rec
-
-        # 2) Fallback search on owner_id
-        like_pattern = f"%{extracted_text}%"
-        cur = self.conn.execute(
-            "SELECT * FROM watermarks WHERE owner_id LIKE ? LIMIT 1;",
-            (like_pattern,),
-        )
-        row = cur.fetchone()
-        return self._row_to_record(row)
+                # 2) Fallback search on owner_id
+                like_pattern = f"%{extracted_text}%"
+                cur.execute(
+                    "SELECT * FROM watermarks WHERE owner_id LIKE %s LIMIT 1;",
+                    (like_pattern,),
+                )
+                row = cur.fetchone()
+                return self._row_to_record(row)
+        finally:
+            self.pool.putconn(conn)

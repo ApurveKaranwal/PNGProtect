@@ -4,7 +4,7 @@
 
 console.log('🚀 script.js loaded');
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'http://127.0.0.1:8000'; // CHANGE THIS TO YOUR DEPLOYED BACKEND URL IN PRODUCTION
 
 // =============================
 // Theme Toggle Functionality
@@ -523,12 +523,12 @@ function initWatermarkFunctionality() {
         formDataEmbed.append("strength", String(watermarkStrength));
 
         console.log("Sending watermark embed request to backend...");
-        console.log("API endpoint: http://127.0.0.1:8000/watermark/embed");
+        console.log(`API endpoint: ${API_BASE}/watermark/embed`);
         console.log("Form data: file=" + currentWMFile.name + ", owner_id=" + ownerId + ", strength=" + watermarkStrength);
 
         let embedResponse;
         try {
-          embedResponse = await fetch("http://127.0.0.1:8000/watermark/embed", {
+          embedResponse = await fetch(`${API_BASE}/watermark/embed`, {
             method: "POST",
             body: formDataEmbed,
           });
@@ -930,7 +930,7 @@ const registerReceipt = document.getElementById("register-receipt");
 
 async function fetchRegistryAbi() {
   try {
-    const res = await fetch("http://127.0.0.1:8000/registry/abi");
+    const res = await fetch(`${API_BASE}/registry/abi`);
     if (!res.ok) {
       console.error("Failed to fetch registry ABI:", res.status);
       return null;
@@ -1385,7 +1385,7 @@ function initVerifyFunctionality() {
       formData.append("file", currentVfFile);
 
       console.log("Verifying watermark with backend...");
-      const response = await fetch("http://127.0.0.1:8000/verify", {
+      const response = await fetch(`${API_BASE}/verify`, {
         method: "POST",
         body: formData,
       });
@@ -1592,7 +1592,7 @@ function initStripMetadataFunctionality() {
       const formData = new FormData();
       formData.append("file", currentSmFile);
 
-      const response = await fetch("http://127.0.0.1:8000/metadata/strip", {
+      const response = await fetch(`${API_BASE}/metadata/strip`, {
         method: "POST",
         body: formData,
       });

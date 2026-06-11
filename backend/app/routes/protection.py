@@ -4,7 +4,15 @@ from app.services.adversarial import AdversarialProtector
 import io
 
 router = APIRouter()
-protector = AdversarialProtector()
+
+# Lazy load protector to save memory on startup
+_protector = None
+
+def get_protector():
+    global _protector
+    if _protector is None:
+        _protector = AdversarialProtector()
+    return _protector
 
 @router.post("/process")
 async def process_protection(
@@ -34,6 +42,7 @@ async def process_protection(
         if strength > 1.0:
             epsilon = (strength / 100.0) * 0.20
         
+        protector = get_protector()
         protected_bytes, robustness = protector.protect_image(content, strength=epsilon)
 
         return Response(

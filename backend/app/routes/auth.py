@@ -8,9 +8,10 @@ from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import jwt
-import sqlite3
+import psycopg2
 from typing import Optional
 from app.services.hashing import hash_password, verify_password
+import os
 
 router = APIRouter()
 security = HTTPBearer()
@@ -20,9 +21,7 @@ SECRET_KEY = "your-secret-key-change-this-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
-# Database path (use absolute or relative path that works from any directory)
-import os
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "users.db")
+from app.storage.db import get_db_pool
 
 # =============================
 # Pydantic Models
@@ -68,117 +67,126 @@ class AuthError(BaseModel):
 
 def init_db():
     """Initialize users database"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    conn.commit()
-    conn.close()
+    pool = get_db_pool()
+    conn = pool.getconn()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT UNIQUE NOT NULL,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+        conn.commit()
+    finally:
+        pool.putconn(conn)
 
 
 def get_user_by_email(email: str) -> Optional[dict]:
     """Get user by email"""
+    pool = get_db_pool()
+    conn = pool.getconn()
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE email = ?", (email,))
-        row = cursor.fetchone()
-        conn.close()
-        
-        if row:
-            return {
-                "id": row[0],
-                "email": row[1],
-                "username": row[2],
-                "password_hash": row[3],
-                "created_at": row[4]
-            }
-        return None
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE email = %s", (email,))
+            row = cursor.fetchone()
+            
+            if row:
+                return {
+                    "id": row[0],
+                    "email": row[1],
+                    "username": row[2],
+                    "password_hash": row[3],
+                    "created_at": str(row[4])
+                }
+            return None
     except Exception as e:
         print(f"Error getting user: {e}")
         return None
+    finally:
+        pool.putconn(conn)
 
 
 def get_user_by_username(username: str) -> Optional[dict]:
     """Get user by username"""
+    pool = get_db_pool()
+    conn = pool.getconn()
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE username = ?", (username,))
-        row = cursor.fetchone()
-        conn.close()
-        
-        if row:
-            return {
-                "id": row[0],
-                "email": row[1],
-                "username": row[2],
-                "password_hash": row[3],
-                "created_at": row[4]
-            }
-        return None
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE username = %s", (username,))
+            row = cursor.fetchone()
+            
+            if row:
+                return {
+                    "id": row[0],
+                    "email": row[1],
+                    "username": row[2],
+                    "password_hash": row[3],
+                    "created_at": str(row[4])
+                }
+            return None
     except Exception as e:
         print(f"Error getting user: {e}")
         return None
+    finally:
+        pool.putconn(conn)
 
 
 def get_user_by_id(user_id: int) -> Optional[dict]:
     """Get user by ID"""
+    pool = get_db_pool()
+    conn = pool.getconn()
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE id = ?", (user_id,))
-        row = cursor.fetchone()
-        conn.close()
-        
-        if row:
-            return {
-                "id": row[0],
-                "email": row[1],
-                "username": row[2],
-                "password_hash": row[3],
-                "created_at": row[4]
-            }
-        return None
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, email, username, password_hash, created_at FROM users WHERE id = %s", (user_id,))
+            row = cursor.fetchone()
+            
+            if row:
+                return {
+                    "id": row[0],
+                    "email": row[1],
+                    "username": row[2],
+                    "password_hash": row[3],
+                    "created_at": str(row[4])
+                }
+            return None
     except Exception as e:
         print(f"Error getting user: {e}")
         return None
+    finally:
+        pool.putconn(conn)
 
 
 def create_user(email: str, username: str, password: str) -> Optional[dict]:
     """Create a new user"""
+    pool = get_db_pool()
+    conn = pool.getconn()
     try:
         password_hash = hash_password(password)
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            INSERT INTO users (email, username, password_hash)
-            VALUES (?, ?, ?)
-        """, (email, username, password_hash))
-        
-        user_id = cursor.lastrowid
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO users (email, username, password_hash)
+                VALUES (%s, %s, %s)
+                RETURNING id
+            """, (email, username, password_hash))
+            
+            user_id = cursor.fetchone()[0]
         conn.commit()
-        conn.close()
         
         return get_user_by_id(user_id)
-    except sqlite3.IntegrityError as e:
-        if "email" in str(e):
+    except psycopg2.IntegrityError as e:
+        conn.rollback()
+        error_msg = str(e)
+        if "email" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
-        elif "username" in str(e):
+        elif "username" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username already taken"
@@ -188,26 +196,29 @@ def create_user(email: str, username: str, password: str) -> Optional[dict]:
             detail="User already exists"
         )
     except Exception as e:
+        conn.rollback()
         print(f"Error creating user: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create user"
         )
+    finally:
+        pool.putconn(conn)
 
 
 def get_watermarks_count(user_id: int) -> int:
     """Get number of watermarks created by user"""
+    pool = get_db_pool()
+    conn = pool.getconn()
     try:
-        watermarks_db = os.path.join(os.path.dirname(__file__), "..", "storage", "watermarks.db")
-        conn = sqlite3.connect(watermarks_db)
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM watermarks WHERE user_id = ?", (user_id,))
-        count = cursor.fetchone()[0]
-        conn.close()
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM watermarks WHERE owner_id = %s", (str(user_id),))
+            count = cursor.fetchone()[0]
         return count
     except Exception:
         return 0
-
+    finally:
+        pool.putconn(conn)
 
 # =============================
 # Token Functions
