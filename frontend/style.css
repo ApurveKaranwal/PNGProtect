@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
+
 /* ===========================
    THEME & RESET
    =========================== */
@@ -308,12 +310,20 @@ body.light-mode .top-nav {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.78rem;
   color: #e5e7eb;
   transition: color var(--transition-med);
+}
+
+.logo span {
+  font-family: 'Caveat', cursive;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: none;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));
 }
 
 body.light-mode .logo {
