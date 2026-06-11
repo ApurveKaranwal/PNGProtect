@@ -16,9 +16,16 @@ To provide creators with a seamless, robust, and non-intrusive solution for asse
 
 ---
 
-## 🌟 Core Features
+## Live Demo
 
-### 🛡️ AI Shield – Adversarial Protection
+**Frontend**: [https://pngprotect.apurve.xyz](https://pngprotect.apurve.xyz)
+**Backend API**: [https://pngprotect-h6f4.onrender.com](https://pngprotect-h6f4.onrender.com)
+
+---
+
+##  Core Features
+
+### ️ AI Shield – Adversarial Protection
 **Prevent unauthorized AI training on your artwork.**
 
 The AI Shield module implements cutting-edge adversarial attack techniques to make images resistant to machine learning model training:
@@ -30,7 +37,7 @@ The AI Shield module implements cutting-edge adversarial attack techniques to ma
 - **Real-time Robustness Scoring**: Quantifies how resistant an image is to adversarial attacks and model interpretation
 - **Zero Visual Quality Loss**: Protected images appear identical to the naked eye—artistic integrity is preserved
 
-### 👁️ AI Confusion Visualizer
+### ️ AI Confusion Visualizer
 **See exactly what the AI sees.**
 
 A powerful educational and diagnostic tool that visualizes how computer vision models perceive your images before and after protection:
@@ -40,7 +47,7 @@ A powerful educational and diagnostic tool that visualizes how computer vision m
 - **Perception Comparison**: Side-by-side view of how a standard ResNet50 model classifies the original vs. protected image
 - **Interactive Analysis**: Upload any image to see how "robust" it naturally is against AI recognition
 
-### 🔐 Invisible Watermarking
+###  Invisible Watermarking
 **Assert ownership with stealth and precision.**
 
 The watermarking module embeds cryptographic proof of ownership directly into image data:
@@ -52,7 +59,7 @@ The watermarking module embeds cryptographic proof of ownership directly into im
 - **Fast Verification**: Watermark extraction takes milliseconds, enabling real-time authenticity checks
 - **Metadata Integration**: Watermarks encode timestamp, creator info, and license metadata
 
-### 🔍 Forensic Tamper Detection
+###  Forensic Tamper Detection
 **Detect manipulation with forensic precision.**
 
 Advanced forensic analysis tools to verify image authenticity and detect unauthorized modifications:
@@ -64,7 +71,7 @@ Advanced forensic analysis tools to verify image authenticity and detect unautho
 - **Statistical Anomaly Detection**: Uses ML classifiers to identify unnatural pixel patterns
 - **Temporal Integrity**: Tracks creation time and modification history when metadata is available
 
-### 🧹 Metadata Management
+###  Metadata Management
 **Privacy-first image distribution.**
 
 Comprehensive metadata handling for secure sharing:
@@ -75,7 +82,7 @@ Comprehensive metadata handling for secure sharing:
 - **Device Anonymization**: Removes software/firmware information that could identify you
 - **Selective Preservation**: Option to keep essential color space info while removing sensitive data
 
-### 📋 Registry Management
+###  Registry Management
 **On-chain ownership records (Blockchain Integration).**
 
 Optional Web3 integration for decentralized ownership verification:
@@ -86,7 +93,7 @@ Optional Web3 integration for decentralized ownership verification:
 - **Multi-Chain Support**: Extensible architecture for Polygon, Arbitrum, and other L2s
 - **Registry Verification**: Public verification of ownership claims
 
-### 🤖 Detection & Classification
+###  Detection & Classification
 **ML-powered image analysis.**
 
 Advanced machine learning capabilities for content analysis:
@@ -96,7 +103,7 @@ Advanced machine learning capabilities for content analysis:
 - **Batch Processing**: Support for processing multiple images at scale
 - **Performance Metrics**: Accuracy, precision, recall, and F1 scores for all classifiers
 
-### 🔐 Authentication & Security
+###  Authentication & Security
 **Enterprise-grade access control.**
 
 Robust security infrastructure for protecting API endpoints:
@@ -109,7 +116,7 @@ Robust security infrastructure for protecting API endpoints:
 
 ---
 
-## 🏗️ Architecture & Technical Stack
+## ️ Architecture & Technical Stack
 
 PNGProtect is engineered as a modern, production-ready full-stack application with separated concerns, asynchronous processing, and enterprise-grade security.
 
@@ -182,7 +189,7 @@ frontend/
 ```
 PNGProtect/
 │
-├── backend/                           # 🧠 Server-side Core Logic
+├── backend/                           #  Server-side Core Logic
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── main.py                   # FastAPI app entry point, routes registration
@@ -213,14 +220,14 @@ PNGProtect/
 │   │   │   └── __pycache__/
 │   │   └── __pycache__/
 │   │
-│   ├── contracts/                    # 🔗 Smart Contracts (Blockchain)
+│   ├── contracts/                    #  Smart Contracts (Blockchain)
 │   │   └── OwnershipRegistry.sol     # Solidity contract for on-chain ownership
 │   │
 │   ├── requirements.txt              # Python package dependencies
 │   ├── .env.example                  # Environment variables template
 │   └── venv/                         # Python virtual environment (auto-created)
 │
-├── frontend/                         # 🎨 Client-side Interface
+├── frontend/                         #  Client-side Interface
 │   ├── index.html                   # Landing page
 │   ├── ai-shield.html               # Protection tool
 │   ├── ai-vision.html               # Confusion visualizer
@@ -255,7 +262,7 @@ PNGProtect/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 Comprehensive setup instructions for local development and production deployment.
 
@@ -375,14 +382,14 @@ Open your browser and navigate to: **`http://localhost:3000`**
 
 ---
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### Complete Workflow Examples
 
 #### Scenario 1: Protecting Original Artwork
 
 1. **Access the App**: Open `http://localhost:3000` in your browser
-2. **Navigate to AI Shield**: Click the "🛡️ AI Shield" tab
+2. **Navigate to AI Shield**: Click the "️ AI Shield" tab
 3. **Upload Your Image**: Drag & drop or select your artwork (JPEG, PNG, BMP)
 4. **Configure Protection**:
    - **Protection Level**: Slider from 1-100%
@@ -394,7 +401,7 @@ Open your browser and navigate to: **`http://localhost:3000`**
 7. **Verify**: Test in any reverse image search to confirm reduced AI visibility
 
 #### Scenario 1.5: Visualizing AI Confusion
-1. **Navigate to AI Vision**: Click the "👁️ AI Vision" tab
+1. **Navigate to AI Vision**: Click the "️ AI Vision" tab
 2. **Upload Image**: Select an image to analyze
 3. **Run Analysis**: Click "Run Visual Analysis"
 4. **View Results**:
@@ -405,7 +412,7 @@ Open your browser and navigate to: **`http://localhost:3000`**
 #### Scenario 2: Embedding & Verifying Ownership
 
 1. **Embed Watermark**:
-   - Go to "🔐 Watermark" tab
+   - Go to " Watermark" tab
    - Upload your original image
    - Enter your Owner ID (email, hash, or identifier)
    - Add optional metadata (title, copyright year)
@@ -413,18 +420,18 @@ Open your browser and navigate to: **`http://localhost:3000`**
    - Download the watermarked image
 
 2. **Verify Ownership**:
-   - Go to "✅ Verify" tab
+   - Go to " Verify" tab
    - Upload any image (original or modified)
    - Click "Check Watermark"
    - System displays:
-     - ✅ Watermark found / ❌ No watermark
+     -  Watermark found /  No watermark
      - Owner ID (if present)
      - Confidence score
      - Extraction timestamp
 
 #### Scenario 3: Forensic Analysis
 
-1. **Upload Suspect Image**: Go to "🔍 Detection" tab
+1. **Upload Suspect Image**: Go to " Detection" tab
 2. **Run Analysis**: Click "Analyze for Tampering"
 3. **Review Results**:
    - **Manipulation Score**: 0-100% likelihood of modification
@@ -435,7 +442,7 @@ Open your browser and navigate to: **`http://localhost:3000`**
 
 #### Scenario 4: Privacy-Safe Sharing
 
-1. **Upload Image**: Go to "🧹 Metadata" tab
+1. **Upload Image**: Go to " Metadata" tab
 2. **Review Metadata**: See current EXIF, GPS, device info
 3. **Clean Image**: Click "Remove All Metadata"
 4. **Download**: Save cleaned image without personal information
@@ -443,7 +450,7 @@ Open your browser and navigate to: **`http://localhost:3000`**
 
 ---
 
-## 🔌 API Integration Examples
+##  API Integration Examples
 
 ### Using the REST API Directly
 
@@ -533,7 +540,7 @@ print(f"Watermark found: {result['watermark_detected']}")
 
 ---
 
-## 🧪 Testing & Validation
+##  Testing & Validation
 
 ### Manual Testing Checklist
 
@@ -562,7 +569,7 @@ print(f"Watermark found: {result['watermark_detected']}")
 
 ---
 
-## 🔐 Security Considerations
+##  Security Considerations
 
 ### Best Practices
 
@@ -584,7 +591,7 @@ print(f"Watermark found: {result['watermark_detected']}")
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions from the community! Contributions can take many forms:
 
@@ -615,7 +622,7 @@ We welcome contributions from the community! Contributions can take many forms:
 
 ---
 
-## 📚 Additional Resources
+##  Additional Resources
 
 ### Documentation
 - **[API Documentation](http://localhost:8000/docs)**: Interactive Swagger UI (when server is running)
@@ -636,19 +643,19 @@ We welcome contributions from the community! Contributions can take many forms:
 
 ---
 
-## 📄 License
+##  License
 
 Distributed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details.
 
 This means you are free to:
-- ✅ Use commercially
-- ✅ Modify and distribute
-- ✅ Use privately
-- ⚠️ Must include license and copyright notice
+-  Use commercially
+-  Modify and distribute
+-  Use privately
+- ️ Must include license and copyright notice
 
 ---
 
-## 🚀 Roadmap
+##  Roadmap
 
 ### Upcoming Features (v0.4+)
 - [ ] Batch processing API for enterprise users
@@ -671,7 +678,7 @@ This means you are free to:
 ---
 
 <p align="center">
-  <strong>Built with ❤️ by Apurve Karanwal</strong>
+  <strong>Built with ️ by Apurve Karanwal</strong>
   <br>
   <a href="https://github.com/ApurveKaranwal/PNGProtect">GitHub</a> • 
   <a href="LICENSE">License</a> • 

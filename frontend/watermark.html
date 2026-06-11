@@ -34,7 +34,7 @@
       <button id="disconnect-wallet-btn" class="btn ghost" style="display:none;">Disconnect</button>
       <span id="wallet-address" class="wallet-address">Not connected</span>
       <button id="theme-toggle-btn" type="button" class="btn ghost theme-toggle"
-        title="Toggle light/dark mode">🌙</button>
+        title="Toggle light/dark mode">Dark</button>
     </div>
   </header>
 
@@ -105,7 +105,7 @@
 
           <div class="preview-wrapper">
             <div class="preview-placeholder" id="wm-preview-placeholder">
-              <span class="preview-icon">🖼️</span>
+              <span class="preview-icon">️</span>
               <p>Upload an image to preview</p>
             </div>
 
@@ -139,14 +139,14 @@
             <p>Our implementation utilizes <strong>Least Significant Bit (LSB) Steganography</strong>. Here is how it
               works under the hood:</p>
             <ul style="list-style-type: none; padding-left: 0; line-height: 1.6; font-size: 0.95em;">
-              <li style="margin-bottom: 0.5rem;">🔹 <strong>Pixel Data:</strong> An image is a grid of pixels. Each
+              <li style="margin-bottom: 0.5rem;"> <strong>Pixel Data:</strong> An image is a grid of pixels. Each
                 pixel has Red, Green, and Blue values (0-255).</li>
-              <li style="margin-bottom: 0.5rem;">🔹 <strong>Binary Conversion:</strong> The value 255 in binary is
+              <li style="margin-bottom: 0.5rem;"> <strong>Binary Conversion:</strong> The value 255 in binary is
                 <code>11111111</code>. The last digit is the "Current LSB".
               </li>
-              <li style="margin-bottom: 0.5rem;">🔹 <strong>Injection:</strong> We replace this last bit with a bit from
+              <li style="margin-bottom: 0.5rem;"> <strong>Injection:</strong> We replace this last bit with a bit from
                 your encrypted Owner ID.</li>
-              <li>🔹 <strong>Result:</strong> Changing 255 to 254 (<code>11111110</code>) is visually identical to the
+              <li> <strong>Result:</strong> Changing 255 to 254 (<code>11111110</code>) is visually identical to the
                 human eye, but a computer can read that last bit to reconstruct the message.</li>
             </ul>
           </div>

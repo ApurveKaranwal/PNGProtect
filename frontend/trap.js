@@ -2,7 +2,7 @@
 // AI Trap Frontend Logic
 // =============================
 
-console.log('🔥 trap.js loaded');
+console.log(' trap.js loaded');
 
 let selectedImageFile = null;
 let selectedFormat = 'json';
@@ -12,7 +12,7 @@ let selectedFormat = 'json';
 // =============================
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ Initializing AI Trap page...');
+    console.log(' Initializing AI Trap page...');
     initTrapPage();
 });
 
@@ -71,7 +71,7 @@ function initTrapPage() {
             document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedFormat = btn.dataset.format;
-            console.log('📋 Format selected:', selectedFormat);
+            console.log(' Format selected:', selectedFormat);
         });
     });
 
@@ -84,7 +84,7 @@ function initTrapPage() {
     // Download button
     document.getElementById('trap-download-btn').addEventListener('click', downloadTrap);
 
-    console.log('✅ AI Trap page initialized');
+    console.log(' AI Trap page initialized');
 }
 
 // =============================
@@ -92,7 +92,7 @@ function initTrapPage() {
 // =============================
 
 function handleImageSelect(file) {
-    console.log('📦 Image selected:', file.name);
+    console.log(' Image selected:', file.name);
 
     // Validate
     if (!file.type.startsWith('image/')) {
@@ -112,7 +112,7 @@ function handleImageSelect(file) {
         preview.style.display = 'block';
         placeholder.style.display = 'none';
 
-        console.log('✅ Image preview loaded');
+        console.log(' Image preview loaded');
     };
     reader.readAsDataURL(file);
 
@@ -133,7 +133,7 @@ async function quickAnalysis() {
         return;
     }
 
-    console.log('🔍 Starting quick analysis...');
+    console.log(' Starting quick analysis...');
 
     const btn = document.getElementById('trap-analyze-btn');
     const originalText = btn.textContent;
@@ -156,7 +156,7 @@ async function quickAnalysis() {
 
         const result = await response.json();
 
-        console.log('✅ Analysis complete:', result);
+        console.log(' Analysis complete:', result);
 
         // Display results
         const score = Math.round(result.poison_potential_score);
@@ -169,10 +169,10 @@ async function quickAnalysis() {
 
         // Suggest intensity
         if (score < 20) {
-            showNotification('💡 Try increasing intensity to 75 for better results', 'info');
+            showNotification(' Try increasing intensity to 75 for better results', 'info');
         }
     } catch (error) {
-        console.error('❌ Analysis failed:', error);
+        console.error(' Analysis failed:', error);
         showNotification(`Analysis error: ${error.message}`, 'error');
     } finally {
         btn.disabled = false;
@@ -190,7 +190,7 @@ async function generateTrap() {
         return;
     }
 
-    console.log('⚡ Starting trap generation...');
+    console.log(' Starting trap generation...');
 
     const btn = document.getElementById('trap-btn');
     const originalText = btn.textContent;
@@ -226,10 +226,10 @@ async function generateTrap() {
             const blob = await response.blob();
             window.trapPackageBlob = blob;
 
-            updateStatus('success', '✅ Trap package generated! Ready to download.');
+            updateStatus('success', ' Trap package generated! Ready to download.');
             document.getElementById('trap-download-btn').disabled = false;
 
-            console.log('✅ ZIP package ready, size:', blob.size, 'bytes');
+            console.log(' ZIP package ready, size:', blob.size, 'bytes');
             showNotification('Trap package generated! Click download to save.', 'success');
         } else {
             // Handle JSON response
@@ -240,15 +240,15 @@ async function generateTrap() {
             // Display metrics
             displayMetrics(result);
 
-            updateStatus('success', '✅ Trap package generated! Ready to download.');
+            updateStatus('success', ' Trap package generated! Ready to download.');
             document.getElementById('trap-download-btn').disabled = false;
 
-            console.log('✅ JSON package ready with', result.poisoned_images.length, 'variants');
+            console.log(' JSON package ready with', result.poisoned_images.length, 'variants');
             showNotification(`Generated ${result.poisoned_images.length} poisoned variants!`, 'success');
         }
     } catch (error) {
-        console.error('❌ Generation failed:', error);
-        updateStatus('error', `❌ Error: ${error.message}`);
+        console.error(' Generation failed:', error);
+        updateStatus('error', ` Error: ${error.message}`);
         showNotification(`Generation error: ${error.message}`, 'error');
     } finally {
         btn.disabled = false;
@@ -261,7 +261,7 @@ async function generateTrap() {
 // =============================
 
 function displayMetrics(result) {
-    console.log('📊 Displaying metrics:', result.summary);
+    console.log(' Displaying metrics:', result.summary);
 
     const score = result.poison_strength_score;
     const summary = result.summary;
@@ -324,7 +324,7 @@ function downloadTrap() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        console.log('✅ ZIP package downloaded');
+        console.log(' ZIP package downloaded');
         showNotification('ZIP package downloaded!', 'success');
     } else {
         if (!window.trapPackageJSON) {
@@ -353,7 +353,7 @@ function downloadTrap() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        console.log('✅ JSON metadata downloaded');
+        console.log(' JSON metadata downloaded');
         showNotification('Metadata downloaded! For full package with images, use ZIP format.', 'info');
     }
 }
@@ -388,4 +388,4 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-console.log('✅ AI Trap frontend initialized');
+console.log(' AI Trap frontend initialized');

@@ -2,7 +2,7 @@
 // Global API_BASE for all scripts
 // =============================
 
-console.log('🚀 script.js loaded');
+console.log(' script.js loaded');
 
 const API_BASE = 'https://pngprotect-h6f4.onrender.com'; // Production Backend URL
 
@@ -21,53 +21,53 @@ function initThemeToggle() {
   const btn = document.getElementById('theme-toggle-btn');
 
   if (!btn) {
-    console.error('❌ Theme button not found');
+    console.error(' Theme button not found');
     return;
   }
 
-  console.log('✅ Theme button found, initializing...');
+  console.log(' Theme button found, initializing...');
   themeInitialized = true;
 
   // Restore saved preference
   const saved = localStorage.getItem('theme-mode') || 'dark-mode';
-  console.log('📦 Saved theme:', saved);
+  console.log(' Saved theme:', saved);
 
   if (saved === 'light-mode') {
     document.body.classList.add('light-mode');
-    btn.textContent = '☀️';
+    btn.textContent = 'Light';
   } else {
     document.body.classList.remove('light-mode');
-    btn.textContent = '🌙';
+    btn.textContent = 'Dark';
   }
 
   // Add click handler
   btn.onclick = function (e) {
     e.preventDefault();
-    console.log('🖱️ Button clicked!');
+    console.log('️ Button clicked!');
 
     const isLight = document.body.classList.contains('light-mode');
     console.log('Current theme is light:', isLight);
 
     if (isLight) {
       document.body.classList.remove('light-mode');
-      btn.textContent = '🌙';
+      btn.textContent = 'Dark';
       localStorage.setItem('theme-mode', 'dark-mode');
-      console.log('🌙 -> Dark mode');
+      console.log('Dark -> Dark mode');
     } else {
       document.body.classList.add('light-mode');
-      btn.textContent = '☀️';
+      btn.textContent = 'Light';
       localStorage.setItem('theme-mode', 'light-mode');
-      console.log('☀️ -> Light mode');
+      console.log('Light -> Light mode');
     }
   };
 }
 
 // Wait for DOM then initialize
 if (document.readyState === 'loading') {
-  console.log('📄 DOM still loading...');
+  console.log(' DOM still loading...');
   document.addEventListener('DOMContentLoaded', initThemeToggle);
 } else {
-  console.log('📄 DOM already loaded');
+  console.log(' DOM already loaded');
   initThemeToggle();
 }
 
@@ -496,7 +496,7 @@ function initWatermarkFunctionality() {
         animation: slideIn 0.3s ease-out;
       `;
           errorDiv.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 4px;">⚠️ Image Already Watermarked</div>
+        <div style="font-weight: 600; margin-bottom: 4px;">️ Image Already Watermarked</div>
         <div>This image was previously watermarked with owner ID: <strong>${existingWatermark.ownerId}</strong>. Cannot re-watermark.</div>
       `;
           document.body.appendChild(errorDiv);
@@ -653,7 +653,7 @@ function initWatermarkFunctionality() {
       animation: slideIn 0.3s ease-out;
     `;
         successDiv.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px;">✓ Watermark Applied</div>
+      <div style="font-weight: 600; margin-bottom: 4px;"> Watermark Applied</div>
       <div>Image successfully watermarked with owner ID: ${ownerId}</div>
     `;
         document.body.appendChild(successDiv);
@@ -688,7 +688,7 @@ function initWatermarkFunctionality() {
       animation: slideIn 0.3s ease-out;
     `;
         errorDiv.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px;">✗ Error</div>
+      <div style="font-weight: 600; margin-bottom: 4px;"> Error</div>
       <div>Failed to process watermark: ${error.message}</div>
     `;
         document.body.appendChild(errorDiv);
@@ -1200,8 +1200,8 @@ if (registerBtn) {
 
       if (!registryAbi || !registryAddress) {
         const errMsg = !registryAddress
-          ? "⚠️ No CONTRACT_ADDRESS set on server. Deploy OwnershipRegistry.sol and set CONTRACT_ADDRESS env var."
-          : "⚠️ Registry ABI not loaded.";
+          ? "️ No CONTRACT_ADDRESS set on server. Deploy OwnershipRegistry.sol and set CONTRACT_ADDRESS env var."
+          : "️ Registry ABI not loaded.";
         registerStatus.textContent = errMsg;
         console.error(errMsg);
         registerBtn.disabled = false;
@@ -1246,7 +1246,7 @@ if (registerBtn) {
       console.log("Transaction sent:", tx.hash);
       registerStatus.textContent = `Pending tx ${tx.hash.slice(0, 10)}…`;
       await tx.wait();
-      registerStatus.textContent = `✓ Registered (${tx.hash.slice(0, 10)}…)`;
+      registerStatus.textContent = ` Registered (${tx.hash.slice(0, 10)}…)`;
       lastRegisterTxHash = tx.hash;
       console.log("Transaction confirmed!", tx.hash);
 
@@ -1307,7 +1307,7 @@ if (verifyOnchainBtn) {
         return;
       }
 
-      registerStatus.textContent = "✅ Registered on-chain";
+      registerStatus.textContent = " Registered on-chain";
       updateRegisterReceipt({
         owner: existingRecord.owner,
         timestamp: existingRecord.timestamp,
@@ -1351,7 +1351,7 @@ function initVerifyFunctionality() {
     const inner = vfDropzone.querySelector('.dropzone-inner');
     if (inner) {
       inner.innerHTML = `
-            <span class="drop-icon">📄</span>
+            <span class="drop-icon"></span>
             <p>${file.name}</p>
             <p class="drop-subtext">Click to change</p>
         `;
@@ -1416,14 +1416,14 @@ function initVerifyFunctionality() {
 
       // Display results
       if (watermarkFound) {
-        vfStatus.textContent = "✓ Watermark verified";
+        vfStatus.textContent = " Watermark verified";
         vfStatus.className = "status-pill status-success";
         vfDetected.textContent = "Yes";
         vfOwner.textContent = ownerID !== "Unknown" ? ownerID : extractedText || "Unknown";
         vfConfidence.textContent = `${confidence}%`;
         console.log(`Watermark found - Owner: ${ownerID}, Extracted: ${extractedText}, Match: ${matchRatio}`);
       } else {
-        vfStatus.textContent = "✗ No watermark detected";
+        vfStatus.textContent = " No watermark detected";
         vfStatus.className = "status-pill status-error";
         vfDetected.textContent = "No";
         vfOwner.textContent = "None";
@@ -1468,7 +1468,7 @@ function initVerifyFunctionality() {
 
     } catch (error) {
       console.error("Verification error:", error);
-      vfStatus.textContent = "✗ Verification failed";
+      vfStatus.textContent = " Verification failed";
       vfStatus.className = "status-pill status-error";
       vfDetected.textContent = "Error";
       vfOwner.textContent = error.message;
@@ -1492,7 +1492,7 @@ function initVerifyFunctionality() {
       animation: slideIn 0.3s ease-out;
     `;
       errorDiv.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px;">✗ Verification Error</div>
+      <div style="font-weight: 600; margin-bottom: 4px;"> Verification Error</div>
       <div>${error.message}</div>
     `;
       document.body.appendChild(errorDiv);
@@ -1736,7 +1736,7 @@ function initDetectionFunctionality() {
     }
     currentDetFile = file;
     detDropzone.querySelector('.dropzone-inner').innerHTML = `
-      <span class="drop-icon">✅</span>
+      <span class="drop-icon"></span>
       <p>${file.name}</p>
       <p class="drop-subtext">${formatFileSize(file.size)}</p>
     `;
@@ -1838,19 +1838,19 @@ function initDetectionFunctionality() {
     // Display verdict banner
     detVerdictContainer.style.display = 'block';
     if (likelyRemoved) {
-      detVerdictIcon.textContent = '❌';
+      detVerdictIcon.textContent = '';
       detVerdictContainer.style.borderLeftColor = '#ef4444';
       detVerdictContainer.style.background = 'rgba(239, 68, 68, 0.1)';
       detVerdictTitle.textContent = 'Suspicious Modification Detected';
       detVerdictText.textContent = 'Significant artifacts suggest the watermark may have been removed or the image altered.';
     } else if (confidence > 40) {
-      detVerdictIcon.textContent = '⚠️';
+      detVerdictIcon.textContent = '️';
       detVerdictContainer.style.borderLeftColor = '#eab308';
       detVerdictContainer.style.background = 'rgba(234, 179, 8, 0.1)';
       detVerdictTitle.textContent = 'Potential Anomalies Found';
       detVerdictText.textContent = 'Some tests showed irregular results. The image may be slightly edited or re-saved.';
     } else {
-      detVerdictIcon.textContent = '✅';
+      detVerdictIcon.textContent = '';
       detVerdictContainer.style.borderLeftColor = '#22c55e';
       detVerdictContainer.style.background = 'rgba(34, 197, 94, 0.1)';
       detVerdictTitle.textContent = 'Authentic Image';
@@ -1875,7 +1875,7 @@ function initDetectionFunctionality() {
       // detectedTechniques contains raw strings from backend, e.g. "Blur", "Recompression"
       const isFailed = detectedTechniques.some(t => t.includes(check.id));
 
-      const icon = isFailed ? '⚠️' : '✅';
+      const icon = isFailed ? '️' : '';
       const color = isFailed ? '#facc15' : '#86efac'; // Yellow : Green
       const statusText = isFailed ? 'Suspicious' : 'Normal';
 
