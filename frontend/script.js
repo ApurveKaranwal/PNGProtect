@@ -998,7 +998,7 @@ async function connectWallet() {
       disconnectWalletBtn.style.display = "inline-block";
       console.log("Connected to wallet:", connectedAccount);
       // Store wallet connection state
-      localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({ account: connectedAccount }));
+      sessionStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({ account: connectedAccount }));
     }
     await fetchRegistryAbi();
     if (lastWatermarkFound) {
@@ -1034,7 +1034,7 @@ function disconnectWallet() {
   }
 
   // Clear wallet connection state from storage
-  localStorage.removeItem(WALLET_STORAGE_KEY);
+  sessionStorage.removeItem(WALLET_STORAGE_KEY);
   console.log("Wallet disconnected");
 }
 
@@ -1115,7 +1115,7 @@ function setupMetaMaskListeners() {
       walletAddressSpan.textContent = displayAddr;
       connectWalletBtn.style.display = "none";
       disconnectWalletBtn.style.display = "inline-block";
-      localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({ account: connectedAccount }));
+      sessionStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify({ account: connectedAccount }));
       console.log("Account switched to:", connectedAccount);
     } else {
       // User disconnected from MetaMask
@@ -1142,7 +1142,6 @@ if (disconnectWalletBtn) {
 
 // =============================
 // Wallet Initialization on Page Load
-// Clear any residual wallet data to ensure fresh state
 // =============================
 function initializeWalletState() {
   if (!connectWalletBtn || !disconnectWalletBtn || !walletAddressSpan) {
@@ -1150,9 +1149,14 @@ function initializeWalletState() {
     return;
   }
 
-  // Always start with wallet disconnected on page load
-  // User must explicitly click "Connect Wallet" each time
-  localStorage.removeItem(WALLET_STORAGE_KEY);
+  // Check if wallet was connected in this session
+  const stored = sessionStorage.getItem(WALLET_STORAGE_KEY);
+  if (stored) {
+    connectWallet(); // Silently reconnect
+    return;
+  }
+
+  sessionStorage.removeItem(WALLET_STORAGE_KEY);
   connectedAccount = null;
   walletAddressSpan.textContent = "Not connected";
   connectWalletBtn.style.display = "inline-block";
