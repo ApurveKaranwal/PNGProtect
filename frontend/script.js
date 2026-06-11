@@ -4,7 +4,7 @@
 
 console.log('🚀 script.js loaded');
 
-const API_BASE = 'http://127.0.0.1:8000'; // CHANGE THIS TO YOUR DEPLOYED BACKEND URL IN PRODUCTION
+const API_BASE = 'https://pngprotect-h6f4.onrender.com'; // Production Backend URL
 
 // =============================
 // Theme Toggle Functionality
