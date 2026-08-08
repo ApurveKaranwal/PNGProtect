@@ -86,4 +86,4 @@ new_html = new_html.replace('<!-- FOOTER -->', tech_stack_html + '\n  <!-- FOOTE
 with open(index_path, 'w', encoding='utf-8') as f:
     f.write(new_html)
 
-print('Updated UI fonts, icons, and tech stack section!')
+print('Updated UI , icons, and tech stack section!')
